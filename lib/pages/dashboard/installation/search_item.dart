@@ -1,9 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/authentication/login/login_page.dart';
 import 'package:loyalty_program/pages/dashboard/claim_points/claim_points.dart';
 import 'package:loyalty_program/pages/dashboard/dashboard.dart';
@@ -45,7 +48,7 @@ class _SearchNewItemState extends State<SearchNewItem> {
 
   @override
   Widget build(BuildContext context) {
-    void handleMenuItemTap(String selectedTitle) {
+    void handleMenuItemTap(String selectedTitle) async {
       if (selectedTitle == "Home") {
         Navigator.pushReplacement(
           context,
@@ -67,6 +70,7 @@ class _SearchNewItemState extends State<SearchNewItem> {
           MaterialPageRoute(builder: (_) => LoyaltyRewards()),
         );
       } else if (selectedTitle == "Logout") {
+        await UserPrefsService.clearUser();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => LoginPage()), // 👈 your login page

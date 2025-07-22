@@ -118,7 +118,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
                       textStyle: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: kTextFieldTextColor,
+                        color: kPrimaryColor,
                       ),
                     ),
                   ),

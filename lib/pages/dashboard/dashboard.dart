@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/authentication/login/login_page.dart';
 import 'package:loyalty_program/pages/dashboard/claim_points/claim_points.dart';
 import 'package:loyalty_program/pages/dashboard/installation/search_item.dart';
@@ -19,7 +22,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
-    void handleMenuItemTap(String selectedTitle) {
+    Future<void> handleMenuItemTap(String selectedTitle) async {
       if (selectedTitle == "Installation") {
         Navigator.pushReplacement(
           context,
@@ -41,6 +44,7 @@ class _DashboardState extends State<Dashboard> {
           MaterialPageRoute(builder: (_) => PointsInventoryHistory()),
         );
       } else if (selectedTitle == "Logout") {
+        await UserPrefsService.clearUser();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => LoginPage()), // 👈 your login page

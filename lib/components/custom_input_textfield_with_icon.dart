@@ -79,9 +79,9 @@ class CustomInputFieldWithIcon extends StatelessWidget {
                 ),
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.w400,
-                    color: kTextFieldTextColor,
+                    color: kPrimaryColor,
                   ),
                 ),
               ),

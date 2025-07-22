@@ -36,4 +36,5 @@ const kDefaultShadow = BoxShadow(
 );
 
 //URLs
-const BaseURL = "https://www.google.com/";
+const BaseURL = 'https://loyalty-program.ziewnic.com/mobile_app_apis/';
+const LoginAPI = 'login.php';
