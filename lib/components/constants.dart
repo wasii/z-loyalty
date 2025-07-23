@@ -38,3 +38,6 @@ const kDefaultShadow = BoxShadow(
 //URLs
 const BaseURL = 'https://loyalty-program.ziewnic.com/mobile_app_apis/';
 const LoginAPI = 'login.php';
+const SendOTP = 'send_otp.php';
+const ForgotPassword = 'forgot_password.php';
+const ChangePassword = 'change_password.php';

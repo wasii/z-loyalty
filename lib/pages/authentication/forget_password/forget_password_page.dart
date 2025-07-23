@@ -1,7 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
+import 'package:loyalty_program/models/send_otp_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/otp_screen/enter_otp_page.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
@@ -12,24 +16,29 @@ class ForgetPasswordPage extends StatefulWidget {
 }
 
 class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
   bool isButtonEnabled = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    emailController.addListener(_updateButtonState);
+    phoneNumberController.addListener(_updateButtonState);
   }
 
   void _updateButtonState() {
     setState(() {
-      isButtonEnabled = emailController.text.isNotEmpty;
+      final text = phoneNumberController.text;
+      isButtonEnabled = text.isNotEmpty && text.length == 11;
+      if (isButtonEnabled) {
+        FocusScope.of(context).unfocus();
+      }
     });
   }
 
   @override
   void dispose() {
-    emailController.dispose();
+    phoneNumberController.dispose();
     super.dispose();
   }
 
@@ -87,18 +96,19 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    "Please enter your email to reset the password",
+                    "Please enter your phone number to reset the password",
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(fontSize: 13),
                     ),
                   ),
                   SizedBox(height: 30),
                   CustomInputField(
-                    controller: emailController,
-                    headingText: 'Your Email',
-                    hintText: 'Enter Your Email',
+                    controller: phoneNumberController,
+                    headingText: 'Phone Number',
+                    hintText: 'Enter Your Phone Number',
                     isRequired: true,
                     textHeight: 54,
+                    keyboardType: TextInputType.phone,
                   ),
                   SizedBox(height: 20),
                   SizedBox(
@@ -107,13 +117,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                     child: ElevatedButton(
                       onPressed: isButtonEnabled
                           ? () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EnterOTPPage(email: emailController.text),
-                                ),
-                              );
+                              sendOTP();
                             }
                           : null,
                       style: ButtonStyle(
@@ -157,8 +161,82 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               ),
             ),
           ),
+          if (isLoading) _buildLoader(),
         ],
       ),
     );
+  }
+
+  Widget _buildLoader() {
+    return Container(
+      color: Colors.black.withAlpha(50),
+      child: const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      ),
+    );
+  }
+
+  void sendOTP() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      final String phoneNumber = phoneNumberController.text;
+
+      final response = await api.request(
+        path: SendOTP,
+        type: RequestType.post,
+        data: {'username': phoneNumber},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final model = SendOTPModel.fromJson(json);
+
+      phoneNumberController.text = '';
+      if (model.error == 0) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                EnterOTPPage(email: phoneNumberController.text),
+          ),
+        );
+      } else {
+        // Show error alert from response message
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Sent OTP Failed"),
+            content: Text(model.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Sent OTP Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

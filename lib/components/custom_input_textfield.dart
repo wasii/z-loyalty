@@ -8,6 +8,7 @@ class CustomInputField extends StatefulWidget {
   final String hintText;
   final bool isRequired;
   final double textHeight;
+  final TextInputType keyboardType;
 
   const CustomInputField({
     super.key,
@@ -16,6 +17,7 @@ class CustomInputField extends StatefulWidget {
     required this.hintText,
     required this.isRequired,
     required this.textHeight,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
@@ -81,7 +83,8 @@ class _CustomInputFieldState extends State<CustomInputField> {
                   ),
                   alignment: Alignment.center,
                   child: TextField(
-                    keyboardType: _getKeyboardType(widget.headingText),
+                    keyboardType: widget
+                        .keyboardType, // _getKeyboardType(widget.headingText),
                     controller: widget.controller,
                     obscureText: isPasswordField ? _obscureText : false,
                     decoration: InputDecoration(
@@ -116,7 +119,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
                     ),
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
                         fontWeight: FontWeight.w400,
                         color: kPrimaryColor,
                       ),
@@ -132,15 +135,15 @@ class _CustomInputFieldState extends State<CustomInputField> {
     );
   }
 
-  TextInputType _getKeyboardType(String label) {
-    final lower = label.toLowerCase();
-    if (lower.contains('email') || lower.contains('your email')) {
-      return TextInputType.emailAddress;
-    } else if (lower.contains('whatsapp number') ||
-        lower.contains('phone') ||
-        lower.contains('number')) {
-      return TextInputType.phone;
-    }
-    return TextInputType.text;
-  }
+  // TextInputType _getKeyboardType(String label) {
+  //   final lower = label.toLowerCase();
+  //   if (lower.contains('email') || lower.contains('your email')) {
+  //     return TextInputType.emailAddress;
+  //   } else if (lower.contains('whatsapp number') ||
+  //       lower.contains('phone') ||
+  //       lower.contains('number')) {
+  //     return TextInputType.phone;
+  //   }
+  //   return TextInputType.text;
+  // }
 }
