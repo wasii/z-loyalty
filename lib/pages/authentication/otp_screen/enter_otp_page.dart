@@ -1,13 +1,17 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_otp_fields.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
+import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/models/send_otp_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/update_password/update_new_password.dart';
 
 class EnterOTPPage extends StatefulWidget {
-  final String email;
-  const EnterOTPPage({super.key, required this.email});
+  final String phoneNumber;
+  const EnterOTPPage({super.key, required this.phoneNumber});
 
   @override
   State<EnterOTPPage> createState() => _EnterOTPPageState();
@@ -15,17 +19,48 @@ class EnterOTPPage extends StatefulWidget {
 
 class _EnterOTPPageState extends State<EnterOTPPage> {
   bool isButtonEnabled = false;
+  bool isLoading = false;
+  int secondsRemaining = 60;
+  Timer? _timer;
+  bool isResendEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startResendTimer();
+  }
+
+  void _startResendTimer() {
+    setState(() {
+      isResendEnabled = false;
+      secondsRemaining = 60;
+    });
+
+    _timer?.cancel();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (secondsRemaining == 0) {
+        timer.cancel();
+        setState(() {
+          isResendEnabled = true;
+        });
+      } else {
+        setState(() {
+          secondsRemaining--;
+        });
+      }
+    });
+  }
 
   void handleOTPChanged(String code) {
-    if (code.length == 5) {
-      setState(() {
-        isButtonEnabled = true;
-      });
-    } else {
-      setState(() {
-        isButtonEnabled = false;
-      });
-    }
+    setState(() {
+      isButtonEnabled = code.length == 5;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -56,13 +91,12 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero, // No extra padding
+                        padding: EdgeInsets.zero,
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                         elevation: 0,
-                        shape:
-                            const CircleBorder(), // optional: makes it circular
-                        minimumSize: Size(40, 40), // Make it same as image size
+                        shape: const CircleBorder(),
+                        minimumSize: Size(40, 40),
                       ),
                       child: Image.asset(
                         '${kIconFolder}back_button.png',
@@ -72,7 +106,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                   ),
                   SizedBox(height: 30),
                   Text(
-                    "Check your email",
+                    "Check your inbox",
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
                         fontSize: 18,
@@ -83,20 +117,16 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                   SizedBox(height: 5),
                   Text.rich(
                     TextSpan(
-                      text: 'We sent a reset link to ',
+                      text: 'We have sent the verification code on ',
                       style: GoogleFonts.poppins(
                         textStyle: TextStyle(fontSize: 13),
                       ),
                       children: [
                         TextSpan(
-                          text: widget.email,
+                          text: widget.phoneNumber,
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        TextSpan(
-                          text:
-                              ' enter 5 digit code that mentioned in the email.',
                         ),
                       ],
                     ),
@@ -122,25 +152,45 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                       );
                     },
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      isResendEnabled
+                          ? "You can now resend the code."
+                          : "Resend code in 00:${secondsRemaining.toString().padLeft(2, '0')}",
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Haven't got email yet?",
+                        "Didn't receive OTP?",
                         style: GoogleFonts.poppins(
                           textStyle: const TextStyle(fontSize: 16),
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: isResendEnabled
+                            ? () {
+                                resendOTP();
+                              }
+                            : null,
                         child: Text(
-                          "Resend email",
+                          "Resend code",
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: kPrimaryColor,
+                              color: isResendEnabled
+                                  ? kPrimaryColor
+                                  : Colors.grey,
                             ),
                           ),
                         ),
@@ -151,8 +201,65 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
               ),
             ),
           ),
+          if (isLoading) Loader(),
         ],
       ),
     );
+  }
+
+  void resendOTP() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+
+      final response = await api.request(
+        path: SendOTP,
+        type: RequestType.post,
+        data: {'username': widget.phoneNumber},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final model = SendOTPModel.fromJson(json);
+
+      if (model.error == 0) {
+        _startResendTimer();
+      } else {
+        // Show error alert from response message
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Resend OTP Failed"),
+            content: Text(model.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Sent OTP Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

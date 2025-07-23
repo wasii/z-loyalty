@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
+import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/models/send_otp_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/otp_screen/enter_otp_page.dart';
@@ -161,17 +162,8 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               ),
             ),
           ),
-          if (isLoading) _buildLoader(),
+          if (isLoading) Loader(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildLoader() {
-    return Container(
-      color: Colors.black.withAlpha(50),
-      child: const Center(
-        child: CircularProgressIndicator(color: Colors.white),
       ),
     );
   }
@@ -194,13 +186,11 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       final json = response.data;
       final model = SendOTPModel.fromJson(json);
 
-      phoneNumberController.text = '';
       if (model.error == 0) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                EnterOTPPage(email: phoneNumberController.text),
+            builder: (context) => EnterOTPPage(phoneNumber: phoneNumber),
           ),
         );
       } else {
@@ -214,6 +204,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  phoneNumberController.text = '';
                 },
                 child: const Text("OK"),
               ),
