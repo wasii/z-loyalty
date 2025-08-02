@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/models/forgot_passwrod_model.dart';
 import 'package:loyalty_program/models/send_otp_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/otp_screen/enter_otp_page.dart';
@@ -118,7 +119,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                     child: ElevatedButton(
                       onPressed: isButtonEnabled
                           ? () {
-                              sendOTP();
+                              forgotPassword();
                             }
                           : null,
                       style: ButtonStyle(
@@ -168,7 +169,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
     );
   }
 
-  void sendOTP() async {
+  void forgotPassword() async {
     FocusScope.of(context).unfocus();
     setState(() => isLoading = true);
 
@@ -177,14 +178,14 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       final String phoneNumber = phoneNumberController.text;
 
       final response = await api.request(
-        path: SendOTP,
+        path: ForgotPassword,
         type: RequestType.post,
         data: {'username': phoneNumber},
         useFormData: true,
       );
 
       final json = response.data;
-      final model = SendOTPModel.fromJson(json);
+      final model = ForgotPasswrodModel.fromJson(json);
 
       if (model.error == 0) {
         Navigator.push(

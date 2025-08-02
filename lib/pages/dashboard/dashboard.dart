@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/models/dashboard_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
-import 'package:loyalty_program/pages/authentication/login/login_page.dart';
+import 'package:loyalty_program/pages/authentication/login/login_page.dart'
+    hide LoginAPI;
 import 'package:loyalty_program/pages/dashboard/claim_points/claim_points.dart';
 import 'package:loyalty_program/pages/dashboard/installation/search_item.dart';
 import 'package:loyalty_program/pages/dashboard/loyalty_rewards/loyalty_rewards.dart';
@@ -20,6 +23,26 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  String _points = "0";
+  bool isLoading = false;
+  DashboardPointsModel? dashboardPointsModel;
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      dashboardData();
+    });
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    if (dashboardPointsModel != null) {
+      _points = dashboardPointsModel!.myCurrentAvailablePoints;
+    }
+    super.setState(fn);
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<void> handleMenuItemTap(String selectedTitle) async {
@@ -75,7 +98,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
               Text(
-                "POINTS: 0",
+                "POINTS: $_points",
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -85,15 +108,22 @@ class _DashboardState extends State<Dashboard> {
               ),
               SizedBox(height: 20),
               Expanded(
-                child: ListView(
-                  children: [
-                    _buildRewardImage("$kBGFolder/reward1.png"),
-                    SizedBox(height: 30),
-                    _buildRewardImage("$kBGFolder/reward1.png"),
-                    SizedBox(height: 30),
-                    _buildRewardImage("$kBGFolder/reward1.png"),
-                  ],
-                ),
+                child:
+                    dashboardPointsModel != null &&
+                        dashboardPointsModel!.links.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: dashboardPointsModel!.links.length,
+                        itemBuilder: (context, index) {
+                          final imageUrl = dashboardPointsModel!.links[index];
+                          return Column(
+                            children: [
+                              _buildRewardImage(imageUrl),
+                              const SizedBox(height: 30),
+                            ],
+                          );
+                        },
+                      )
+                    : const SizedBox(),
               ),
             ],
           ),
@@ -102,7 +132,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildRewardImage(String assetPath) {
+  Widget _buildRewardImage(String imageUrl) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -116,13 +146,67 @@ class _DashboardState extends State<Dashboard> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child: Image.asset(
-          assetPath,
+        child: Image.network(
+          imageUrl,
           fit: BoxFit.cover,
           height: 180,
           width: double.infinity,
+          errorBuilder: (context, error, stackTrace) => Container(
+            height: 180,
+            color: Colors.grey[300],
+            child: const Center(child: Icon(Icons.broken_image)),
+          ),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              height: 180,
+              color: Colors.grey[200],
+              child: const Center(child: CircularProgressIndicator()),
+            );
+          },
         ),
       ),
     );
+  }
+
+  void dashboardData() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      var user = await UserPrefsService.getUser();
+      final response = await api.request(
+        path: DashboardGetPoints,
+        type: RequestType.post,
+        data: {'user_id': user?.id},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final dashboard = DashboardPointsModel.fromJson(json);
+
+      if (dashboard.error == 0) {
+        setState(() {
+          dashboardPointsModel = dashboard;
+        });
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Dashboard Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

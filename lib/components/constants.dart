@@ -41,3 +41,5 @@ const LoginAPI = 'login.php';
 const SendOTP = 'send_otp.php';
 const ForgotPassword = 'forgot_password.php';
 const ChangePassword = 'change_password.php';
+
+const DashboardGetPoints = 'installer_dashboard.php';

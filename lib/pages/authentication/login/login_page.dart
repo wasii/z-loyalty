@@ -22,8 +22,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController(
+    text: '03332538203',
+  );
+  final TextEditingController passwordController = TextEditingController(
+    text: 'Pakistan',
+  );
 
   bool isButtonEnabled = false;
   bool rememberMe = false;
