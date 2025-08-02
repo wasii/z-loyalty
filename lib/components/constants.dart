@@ -44,5 +44,7 @@ const ChangePassword = 'change_password.php';
 
 const DashboardGetPoints = 'installer_dashboard.php';
 
+//Registration
+const CheckUserName = 'check_username_available.php';
 //Installation
 const VerifySerialNumber = 'verify_serial.php';

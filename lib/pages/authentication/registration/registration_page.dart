@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
+import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/models/check_username_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/registration_successful/registration_successful.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -33,6 +38,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   bool isButtonEnabled = false;
   bool rememberMe = false;
+  bool isLoading = false;
+
+  bool usernameExist = false;
+
+  final FocusNode userFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -46,6 +56,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
     cityController.addListener(_updateButtonState);
     experienceInYearsController.addListener(_updateButtonState);
     addressController.addListener(_updateButtonState);
+
+    userFocusNode.addListener(() {
+      if (!userFocusNode.hasFocus) {
+        checkUsername();
+      }
+    });
   }
 
   void _updateButtonState() {
@@ -59,7 +75,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
           emailController.text.isNotEmpty &&
           cityController.text.isNotEmpty &&
           experienceInYearsController.text.isNotEmpty &&
-          addressController.text.isNotEmpty;
+          addressController.text.isNotEmpty &&
+          usernameExist;
     });
   }
 
@@ -74,6 +91,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     cityController.dispose();
     experienceInYearsController.dispose();
 
+    userFocusNode.dispose();
     super.dispose();
   }
 
@@ -164,6 +182,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               hintText: 'Type username',
                               isRequired: true,
                               textHeight: 57,
+                              keyboardType: TextInputType.phone,
+                              focusNode: userFocusNode,
                             ),
                             CustomInputField(
                               controller: passwordController,
@@ -299,8 +319,67 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
             ),
           ),
+          if (isLoading) Loader(),
         ],
       ),
     );
+  }
+
+  void checkUsername() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      final String phoneNumber = userNameController.text;
+
+      final response = await api.request(
+        path: CheckUserName,
+        type: RequestType.post,
+        data: {'username': phoneNumber},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final model = CheckUsernameModel.fromJson(json);
+
+      if (model.error == 0) {
+        usernameExist = true;
+      } else {
+        // Show error alert from response message
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Registration Failed"),
+            content: Text(model.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  usernameExist = false;
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Registration Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

@@ -6,7 +6,6 @@ import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/models/forgot_passwrod_model.dart';
-import 'package:loyalty_program/models/send_otp_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/otp_screen/enter_otp_page.dart';
 
