@@ -43,3 +43,6 @@ const ForgotPassword = 'forgot_password.php';
 const ChangePassword = 'change_password.php';
 
 const DashboardGetPoints = 'installer_dashboard.php';
+
+//Installation
+const VerifySerialNumber = 'verify_serial.php';

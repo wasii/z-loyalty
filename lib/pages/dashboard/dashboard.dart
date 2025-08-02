@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/models/dashboard_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
@@ -82,89 +83,83 @@ class _DashboardState extends State<Dashboard> {
         onMenuItemTap: handleMenuItemTap,
       ),
       appBar: AppBar(backgroundColor: kPrimaryColor, elevation: 1),
-      body: SafeArea(
-        child: CommonScaffoldLayout(
-          title: "Home",
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "MY CURRENT AVAILABLE",
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: CommonScaffoldLayout(
+              title: "Home",
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "MY CURRENT AVAILABLE",
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Text(
-                "POINTS: $_points",
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                  Text(
+                    "POINTS: $_points",
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child:
+                        dashboardPointsModel != null &&
+                            dashboardPointsModel!.links.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: dashboardPointsModel!.links.length,
+                            itemBuilder: (context, index) {
+                              final imageUrl =
+                                  dashboardPointsModel!.links[index];
+                              return Column(
+                                children: [
+                                  _buildRewardImage(imageUrl),
+                                  const SizedBox(height: 30),
+                                ],
+                              );
+                            },
+                          )
+                        : const SizedBox(),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              Expanded(
-                child:
-                    dashboardPointsModel != null &&
-                        dashboardPointsModel!.links.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: dashboardPointsModel!.links.length,
-                        itemBuilder: (context, index) {
-                          final imageUrl = dashboardPointsModel!.links[index];
-                          return Column(
-                            children: [
-                              _buildRewardImage(imageUrl),
-                              const SizedBox(height: 30),
-                            ],
-                          );
-                        },
-                      )
-                    : const SizedBox(),
-              ),
-            ],
+            ),
           ),
-        ),
+          if (isLoading) Loader(),
+        ],
       ),
     );
   }
 
   Widget _buildRewardImage(String imageUrl) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(200),
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        height: 180,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => Container(
           height: 180,
-          width: double.infinity,
-          errorBuilder: (context, error, stackTrace) => Container(
+          color: Colors.grey[300],
+          child: const Center(child: Icon(Icons.broken_image)),
+        ),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
             height: 180,
             color: Colors.grey[300],
-            child: const Center(child: Icon(Icons.broken_image)),
-          ),
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              height: 180,
-              color: Colors.grey[200],
-              child: const Center(child: CircularProgressIndicator()),
-            );
-          },
-        ),
+            child: const Center(child: CircularProgressIndicator()),
+          );
+        },
       ),
     );
   }
