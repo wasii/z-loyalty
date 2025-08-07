@@ -165,11 +165,13 @@ class _SearchNewItemState extends State<SearchNewItem> {
 
       final json = response.data;
       final verify_serial = VerifySerialNumberModel.fromJson(json);
-
       if (verify_serial.error == 0) {
+        var serial = addSerialNumberController.text;
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AddNewItem()),
+          MaterialPageRoute(
+            builder: (context) => AddNewItem(serialNumber: serial),
+          ),
         );
         addSerialNumberController.text = '';
       } else {

@@ -3,13 +3,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
+import 'package:loyalty_program/models/add_installation_model.dart';
 import 'package:loyalty_program/pages/dashboard/dashboard.dart';
 
 class ItemAddedSuccessfully extends StatelessWidget {
-  const ItemAddedSuccessfully({super.key});
+  final String message;
+  const ItemAddedSuccessfully({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
+    final RegExp regex = RegExp(r'^(.*?earned )(\d+)(.*)$');
+    final match = regex.firstMatch(message);
+    final beforePoints = match?.group(1) ?? '';
+    final points = match?.group(2) ?? '';
+    final afterPoints = match?.group(3) ?? '';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(""),
@@ -33,11 +41,11 @@ class ItemAddedSuccessfully extends StatelessWidget {
                   ),
                 ),
                 children: [
-                  TextSpan(text: "You have earned "),
+                  TextSpan(text: beforePoints),
                   WidgetSpan(
                     alignment: PlaceholderAlignment.middle,
                     child: Text(
-                      "30",
+                      points,
                       style: GoogleFonts.poppins(
                         textStyle: TextStyle(
                           fontSize: 32,
@@ -47,16 +55,7 @@ class ItemAddedSuccessfully extends StatelessWidget {
                       ),
                     ),
                   ),
-                  TextSpan(
-                    text: " points",
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
+                  TextSpan(text: afterPoints),
                 ],
               ),
             ),

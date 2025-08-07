@@ -174,7 +174,7 @@ class _DashboardState extends State<Dashboard> {
       final response = await api.request(
         path: DashboardGetPoints,
         type: RequestType.post,
-        data: {'user_id': user?.id},
+        data: {'user_id': 68},
         useFormData: true,
       );
 
