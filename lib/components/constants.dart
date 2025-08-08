@@ -46,6 +46,7 @@ const DashboardGetPoints = 'installer_dashboard.php';
 
 //Registration
 const CheckUserName = 'check_username_available.php';
+const UserRegistration = 'new_registration.php';
 //Installation
 const VerifySerialNumber = 'verify_serial.php';
 const AddInstallation = 'installation_add.php';

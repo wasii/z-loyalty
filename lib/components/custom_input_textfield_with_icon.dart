@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 
-class CustomInputFieldWithIcon extends StatelessWidget {
+class CustomInputFieldWithIcon extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final String imageAssetPath;
@@ -13,6 +13,14 @@ class CustomInputFieldWithIcon extends StatelessWidget {
     required this.hintText,
     required this.imageAssetPath,
   });
+
+  @override
+  State<CustomInputFieldWithIcon> createState() =>
+      _CustomInputFieldWithIconState();
+}
+
+class _CustomInputFieldWithIconState extends State<CustomInputFieldWithIcon> {
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +50,7 @@ class CustomInputFieldWithIcon extends StatelessWidget {
             ),
             child: Center(
               child: Image.asset(
-                imageAssetPath,
+                widget.imageAssetPath,
                 height: 24,
                 width: 24,
                 fit: BoxFit.contain,
@@ -63,10 +71,12 @@ class CustomInputFieldWithIcon extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: TextField(
-                controller: controller,
-                obscureText: hintText.toLowerCase() == 'password',
+                controller: widget.controller,
+                obscureText: widget.hintText.toLowerCase() == 'password'
+                    ? _obscureText
+                    : false,
                 decoration: InputDecoration(
-                  hintText: hintText,
+                  hintText: widget.hintText,
                   hintStyle: GoogleFonts.poppins(
                     textStyle: const TextStyle(
                       fontSize: 16,
@@ -75,7 +85,25 @@ class CustomInputFieldWithIcon extends StatelessWidget {
                     ),
                   ),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  suffixIcon: widget.hintText.toLowerCase() == 'password'
+                      ? IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: kPrimaryColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                        )
+                      : null,
                 ),
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(

@@ -12,8 +12,6 @@ import 'package:loyalty_program/pages/authentication/forget_password/forget_pass
 import 'package:loyalty_program/pages/authentication/registration/registration_page.dart';
 import 'package:loyalty_program/pages/dashboard/dashboard.dart';
 
-const String LoginAPI = 'login.php';
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
