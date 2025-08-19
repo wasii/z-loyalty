@@ -21,10 +21,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController(
-    text: '03332538203',
+    text: '03343309931',
   );
   final TextEditingController passwordController = TextEditingController(
-    text: 'Pakistan',
+    text: 'ZXC!asd110',
   );
 
   bool isButtonEnabled = false;
@@ -36,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     usernameController.addListener(_updateButtonState);
     passwordController.addListener(_updateButtonState);
+    _updateButtonState();
   }
 
   void _updateButtonState() {
@@ -296,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
       passwordController.text = '';
       if (user.error == 0) {
         // Successful login
-        await UserPrefsService.saveUser(user);
+        await UserPrefsService.saveUser(user, rememberMe: rememberMe);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const Dashboard()),

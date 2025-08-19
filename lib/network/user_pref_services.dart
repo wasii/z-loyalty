@@ -4,11 +4,16 @@ import '../models/user_model.dart';
 
 class UserPrefsService {
   static const _key = 'user_model';
+  static const _rememberKey = 'remember_me';
 
-  static Future<void> saveUser(UserModel user) async {
+  static Future<void> saveUser(
+    UserModel user, {
+    bool rememberMe = false,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = jsonEncode(user.toJson());
     await prefs.setString(_key, jsonString);
+    await prefs.setBool(_rememberKey, rememberMe);
   }
 
   static Future<UserModel?> getUser() async {
@@ -19,8 +24,14 @@ class UserPrefsService {
     return UserModel.fromJson(jsonMap);
   }
 
+  static Future<bool> isRemembered() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_rememberKey) ?? false;
+  }
+
   static Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);
+    await prefs.remove(_rememberKey);
   }
 }
