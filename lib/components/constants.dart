@@ -53,3 +53,6 @@ const AddInstallation = 'installation_add.php';
 
 //Claim Points
 const GetClaimPoints = 'claim_points_list.php';
+
+//Loyalty Rewards
+const GetLoyaltyRewards = 'loyalty_rewards_list.php';

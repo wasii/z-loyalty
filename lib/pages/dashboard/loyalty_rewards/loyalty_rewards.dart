@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/table_cell.dart';
+import 'package:loyalty_program/models/loyalty_rewards_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/authentication/login/login_page.dart';
 import 'package:loyalty_program/pages/dashboard/claim_points/claim_points.dart';
@@ -52,10 +55,14 @@ class _LoyaltyRewardsState extends State<LoyaltyRewards> {
     }
   }
 
-  final List<List<String>> data = List.generate(
-    30, // number of rows
-    (_) => ['31-Dec-2024', '1500', 'details', 'remarks', 'bike.jpeg'],
-  );
+  bool isLoading = false;
+  List<LoyaltyReward> rewards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getLoyaltyRewardList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,36 +97,13 @@ class _LoyaltyRewardsState extends State<LoyaltyRewards> {
         backgroundColor: kPrimaryColor,
         elevation: 1,
       ),
-      body: CommonScaffoldLayout(
-        title: "Loyalty Rewards",
-        child: Column(
-          children: [
-            Table(
-              border: TableBorder.all(color: Colors.black),
-              columnWidths: const {
-                0: FlexColumnWidth(1),
-                1: FlexColumnWidth(1),
-                2: FlexColumnWidth(1),
-                3: FlexColumnWidth(1),
-                4: FlexColumnWidth(1),
-              },
+      body: Stack(
+        children: [
+          CommonScaffoldLayout(
+            title: "Loyalty Rewards",
+            child: Column(
               children: [
-                TableRow(
-                  decoration: BoxDecoration(color: Colors.grey.shade300),
-                  children: [
-                    tableHeader('Date'),
-                    tableHeader("Points"),
-                    tableHeader("Details"),
-                    tableHeader("Remarks"),
-                    tableHeader("Files"),
-                  ],
-                ),
-              ],
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Table(
+                Table(
                   border: TableBorder.all(color: Colors.black),
                   columnWidths: const {
                     0: FlexColumnWidth(1),
@@ -129,50 +113,81 @@ class _LoyaltyRewardsState extends State<LoyaltyRewards> {
                     4: FlexColumnWidth(1),
                   },
                   children: [
-                    for (int i = 0; i < data.length; i++)
-                      TableRow(
-                        decoration: BoxDecoration(
-                          color: i % 2 == 0
-                              ? Colors
-                                    .grey
-                                    .shade100 // even rows
-                              : Colors.grey.shade300,
-                        ),
-                        children: List.generate(data[i].length, (index) {
-                          final text = data[i][index];
-
-                          // 👇 Last column special styling
-                          if (index == data[i].length - 1) {
-                            return GestureDetector(
-                              onTap: () {
-                                showImagePopup(context);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  text,
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.blue,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          } else {
-                            return tableCell(text); // normal cell
-                          }
-                        }),
-                      ),
+                    TableRow(
+                      decoration: BoxDecoration(color: Colors.grey.shade300),
+                      children: [
+                        tableHeader('Date'),
+                        tableHeader("Points"),
+                        tableHeader("Details"),
+                        tableHeader("Remarks"),
+                        tableHeader("Files"),
+                      ],
+                    ),
                   ],
                 ),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Table(
+                      border: TableBorder.all(color: Colors.black),
+                      columnWidths: const {
+                        0: FlexColumnWidth(1),
+                        1: FlexColumnWidth(1),
+                        2: FlexColumnWidth(1),
+                        3: FlexColumnWidth(1),
+                        4: FlexColumnWidth(1),
+                      },
+                      children: [
+                        for (int i = 0; i < rewards.length; i++)
+                          TableRow(
+                            decoration: BoxDecoration(
+                              color: i % 2 == 0
+                                  ? Colors
+                                        .grey
+                                        .shade100 // even rows
+                                  : Colors.grey.shade300,
+                            ),
+                            children: [
+                              tableCell(rewards[i].date),
+                              tableCell(rewards[i].points.toString()),
+                              tableCell(rewards[i].rewardClaimDetails ?? ''),
+                              tableCell(rewards[i].rewardRemarks ?? ''),
+                              rewards[i].rewardAttachments.isNotEmpty
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        showNetworkImagePopup(
+                                          context,
+                                          rewards[i]
+                                              .rewardAttachments
+                                              .first
+                                              .link,
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Image.network(
+                                          rewards[i]
+                                              .rewardAttachments
+                                              .first
+                                              .linkThumbnail,
+                                          height: 30,
+                                          width: 30,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          if (isLoading) Loader(),
+        ],
       ),
     );
   }
@@ -233,5 +248,99 @@ class _LoyaltyRewardsState extends State<LoyaltyRewards> {
         );
       },
     );
+  }
+
+  void showNetworkImagePopup(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // user can't dismiss by tapping outside
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: 24,
+          ), // horizontal margin
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    height: 350,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.close, color: kPrimaryColor),
+                  label: Text("Close", style: TextStyle(color: kPrimaryColor)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                    side: BorderSide(color: kPrimaryColor),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void getLoyaltyRewardList() async {
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      final response = await api.request(
+        path: GetLoyaltyRewards,
+        type: RequestType.post,
+        data: {'user_id': 65},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimPoints = LoyaltyRewardsResponse.fromJson(json);
+      if (claimPoints.error == 0) {
+        setState(() {
+          rewards = claimPoints.loyaltyRewards;
+        });
+      } else {}
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Loyalty Rewards Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

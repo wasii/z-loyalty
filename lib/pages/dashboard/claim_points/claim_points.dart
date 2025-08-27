@@ -137,7 +137,6 @@ class _ClaimPointsState extends State<ClaimPoints> {
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 40), // screen side padding
         child: Builder(
           builder: (context) {
-            int total = claims.fold(0, (sum, item) => sum + item.pointsEarned);
             final List<String> buttonTitles = [
               'Claim Cash',
               'Claim Bike',
