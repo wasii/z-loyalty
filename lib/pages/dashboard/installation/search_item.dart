@@ -126,7 +126,6 @@ class _SearchNewItemState extends State<SearchNewItem> {
                     SizedBox(height: 20),
                   ],
                 ),
-                Spacer(),
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
@@ -135,6 +134,19 @@ class _SearchNewItemState extends State<SearchNewItem> {
                     isDisabled: isButtonEnabled,
                     onPressed: () {
                       verifySerialNumber();
+                    },
+                    showImage: false,
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                  child: CustomPrimaryButton(
+                    text: 'Back to List',
+                    isDisabled: isButtonEnabled,
+                    onPressed: () {
+                      // verifySerialNumber();
                     },
                     showImage: false,
                   ),
