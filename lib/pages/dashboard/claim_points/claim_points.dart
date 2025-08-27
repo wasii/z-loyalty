@@ -273,7 +273,7 @@ class _ClaimPointsState extends State<ClaimPoints> {
       final response = await api.request(
         path: GetClaimPoints,
         type: RequestType.post,
-        data: {'user_id': 68},
+        data: {'user_id': 65},
         useFormData: true,
       );
 

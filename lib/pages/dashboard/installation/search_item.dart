@@ -26,8 +26,9 @@ class SearchNewItem extends StatefulWidget {
 }
 
 class _SearchNewItemState extends State<SearchNewItem> {
-  final TextEditingController addSerialNumberController =
-      TextEditingController();
+  final TextEditingController addSerialNumberController = TextEditingController(
+    text: '81ZIGDVD',
+  );
 
   bool isButtonEnabled = false;
   bool isLoading = false;
@@ -35,6 +36,7 @@ class _SearchNewItemState extends State<SearchNewItem> {
   void initState() {
     super.initState();
     addSerialNumberController.addListener(_updateButtonState);
+    _updateButtonState();
   }
 
   void _updateButtonState() {

@@ -9,6 +9,7 @@ import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/models/add_installation_model.dart';
+import 'package:loyalty_program/models/all_items_model.dart';
 import 'package:loyalty_program/models/user_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
@@ -28,7 +29,7 @@ class _AddNewItemState extends State<AddNewItem> {
   final TextEditingController serialNumberController = TextEditingController();
   final TextEditingController addNameController = TextEditingController();
   final TextEditingController addMobileController = TextEditingController();
-  // final TextEditingController addItemController = TextEditingController();
+  final TextEditingController addItemController = TextEditingController();
   final TextEditingController addCityController = TextEditingController();
   final TextEditingController addAddressController = TextEditingController();
 
@@ -39,14 +40,20 @@ class _AddNewItemState extends State<AddNewItem> {
   bool isButtonEnabled = false;
   bool isLoading = false;
   UserModel? user;
+  List<Item> items = [];
+  Item? selectedItem;
+
   @override
   void initState() {
     super.initState();
     _loadUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getAllItems();
+    });
     serialNumberController.text = widget.serialNumber;
     addNameController.addListener(_updateButtonState);
     addMobileController.addListener(_updateButtonState);
-    // addItemController.addListener(_updateButtonState);
+    addItemController.addListener(_updateButtonState);
     addCityController.addListener(_updateButtonState);
     addAddressController.addListener(_updateButtonState);
 
@@ -76,7 +83,7 @@ class _AddNewItemState extends State<AddNewItem> {
       isButtonEnabled =
           addNameController.text.isNotEmpty &&
           addMobileController.text.isNotEmpty &&
-          // addItemController.text.isNotEmpty &&
+          addItemController.text.isNotEmpty &&
           addCityController.text.isNotEmpty &&
           addAddressController.text.isNotEmpty &&
           selectedImages.isNotEmpty;
@@ -88,7 +95,7 @@ class _AddNewItemState extends State<AddNewItem> {
     serialNumberController.dispose();
     addNameController.dispose();
     addMobileController.dispose();
-    // addItemController.dispose();
+    addItemController.dispose();
     addCityController.dispose();
     addAddressController.dispose();
     addRemarksController.dispose();
@@ -153,13 +160,102 @@ class _AddNewItemState extends State<AddNewItem> {
                           isRequired: true,
                           textHeight: 57,
                         ),
-                        // CustomInputField(
-                        //   controller: addItemController,
-                        //   headingText: "Items",
-                        //   hintText: 'Please select items',
-                        //   isRequired: true,
-                        //   textHeight: 57,
-                        // ),
+                        GestureDetector(
+                          onTap: () async {
+                            Item? tempSelectedItem = selectedItem;
+                            await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return StatefulBuilder(
+                                  builder: (context, setStateDialog) {
+                                    return AlertDialog(
+                                      title: Text('Select Item'),
+                                      content: SizedBox(
+                                        width: double.maxFinite,
+                                        height: 300,
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: items.length,
+                                          itemBuilder: (context, index) {
+                                            final item = items[index];
+                                            return RadioListTile<Item>(
+                                              title: Text(
+                                                item.name,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: kPrimaryColor,
+                                                  ),
+                                                ),
+                                              ),
+                                              value: item,
+                                              groupValue: tempSelectedItem,
+                                              onChanged: (Item? value) {
+                                                setStateDialog(() {
+                                                  tempSelectedItem = value!;
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      actions: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                            vertical: 10.0,
+                                          ),
+                                          child: SizedBox(
+                                            width: double.infinity,
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: kPrimaryColor,
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                if (tempSelectedItem != null) {
+                                                  setState(() {
+                                                    selectedItem =
+                                                        tempSelectedItem!;
+                                                    addItemController.text =
+                                                        selectedItem?.name ??
+                                                        '';
+                                                  });
+                                                }
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text(
+                                                'Okay',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: AbsorbPointer(
+                            child: CustomInputField(
+                              controller: addItemController,
+                              headingText: "Items",
+                              hintText: 'Please select items',
+                              isRequired: true,
+                              textHeight: 57,
+                            ),
+                          ),
+                        ),
                         CustomInputField(
                           controller: addCityController,
                           headingText: "City",
@@ -399,7 +495,7 @@ class _AddNewItemState extends State<AddNewItem> {
         'serial_number': widget.serialNumber,
         'client_name': user?.username,
         'client_mobile': user?.contactNos,
-        'item_id': '1',
+        'item_id': selectedItem?.id ?? '1',
         'installation_city': addCityController.text,
         'installation_address': addAddressController.text,
         'upload_pics[]': imageFiles,
@@ -428,7 +524,7 @@ class _AddNewItemState extends State<AddNewItem> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text("Verify Serial Failed"),
+            title: const Text("Add New Item Failed"),
             content: Text(add_installation.message),
             actions: [
               TextButton(
@@ -447,7 +543,7 @@ class _AddNewItemState extends State<AddNewItem> {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text("Upload Failed"),
+          title: const Text("Add New Item Failed"),
           content: Text(e.toString()),
           actions: [
             TextButton(
@@ -457,6 +553,31 @@ class _AddNewItemState extends State<AddNewItem> {
           ],
         ),
       );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void getAllItems() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      final response = await api.request(
+        path: GetProductList,
+        type: RequestType.post,
+        data: {},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final allItem = AllItemsResponse.fromJson(json);
+      if (allItem.error == 0) {
+        items = allItem.items;
+      }
+    } catch (e) {
+      print(e.toString());
     } finally {
       setState(() => isLoading = false);
     }

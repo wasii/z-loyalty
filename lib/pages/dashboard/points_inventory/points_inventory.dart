@@ -150,16 +150,6 @@ class _PointsInventoryHistoryState extends State<PointsInventoryHistory> {
                               tableCell(points[i].details),
                             ],
                           ),
-                        // TableRow(
-                        //   decoration: BoxDecoration(
-                        //     color: Colors.grey.shade300,
-                        //   ),
-                        //   children: [
-                        //     tableCell(''),
-                        //     tableCell(''),
-                        //     tableCell('Total $total'),
-                        //   ],
-                        // ),
                       ],
                     ),
                   ),
