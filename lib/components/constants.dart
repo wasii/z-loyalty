@@ -51,6 +51,7 @@ const UserRegistration = 'new_registration.php';
 const VerifySerialNumber = 'verify_serial.php';
 const AddInstallation = 'installation_add.php';
 const GetProductList = 'items_list.php';
+const GetMyInstallationList = 'installation_list.php';
 
 //Claim Points
 const GetClaimPoints = 'claim_points_list.php';

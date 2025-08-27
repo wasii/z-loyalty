@@ -14,6 +14,7 @@ import 'package:loyalty_program/pages/authentication/login/login_page.dart';
 import 'package:loyalty_program/pages/dashboard/claim_points/claim_points.dart';
 import 'package:loyalty_program/pages/dashboard/dashboard.dart';
 import 'package:loyalty_program/pages/dashboard/installation/add_new_item.dart';
+import 'package:loyalty_program/pages/dashboard/installation/my_list.dart';
 import 'package:loyalty_program/pages/dashboard/loyalty_rewards/loyalty_rewards.dart';
 import 'package:loyalty_program/pages/dashboard/points_inventory/points_inventory.dart';
 import 'package:loyalty_program/pages/dashboard/sidemenu/side_menu.dart';
@@ -146,9 +147,14 @@ class _SearchNewItemState extends State<SearchNewItem> {
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
                   child: CustomPrimaryButton(
                     text: 'Back to List',
-                    isDisabled: isButtonEnabled,
+                    isDisabled: true,
                     onPressed: () {
-                      // verifySerialNumber();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyProductList(),
+                        ),
+                      );
                     },
                     showImage: false,
                   ),
@@ -159,8 +165,6 @@ class _SearchNewItemState extends State<SearchNewItem> {
           if (isLoading) Loader(),
         ],
       ),
-      // bottomNavigationBar:
-      // ),
     );
   }
 
