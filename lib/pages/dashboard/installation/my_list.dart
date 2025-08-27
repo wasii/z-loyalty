@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/loader.dart';
@@ -97,10 +96,10 @@ class _MyProductListState extends State<MyProductList> {
                               ),
                               tableCellWithActions(
                                 onEdit: () {
-                                  print("Edit tapped");
+                                  editItem(installation_list[i]);
                                 },
                                 onView: () {
-                                  print("View tapped");
+                                  viewItem(installation_list[i]);
                                 },
                               ),
                             ],
@@ -118,6 +117,8 @@ class _MyProductListState extends State<MyProductList> {
     );
   }
 
+  void editItem(MyProductsInstallation item) {}
+  void viewItem(MyProductsInstallation item) {}
   void getMyList() async {
     setState(() => isLoading = true);
 
