@@ -56,3 +56,6 @@ const GetClaimPoints = 'claim_points_list.php';
 
 //Loyalty Rewards
 const GetLoyaltyRewards = 'loyalty_rewards_list.php';
+
+//Points Inventory History
+const GetPointsInventoryHistory = 'points_inventory_list.php';
