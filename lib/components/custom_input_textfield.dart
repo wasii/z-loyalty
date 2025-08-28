@@ -10,6 +10,7 @@ class CustomInputField extends StatefulWidget {
   final double textHeight;
   final TextInputType keyboardType;
   final FocusNode? focusNode;
+  final bool editable;
 
   const CustomInputField({
     super.key,
@@ -20,6 +21,7 @@ class CustomInputField extends StatefulWidget {
     required this.textHeight,
     this.keyboardType = TextInputType.text,
     this.focusNode,
+    this.editable = true,
   });
 
   @override
@@ -103,6 +105,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
               focusNode: _focusNode,
               keyboardType: widget.keyboardType,
               obscureText: isPasswordField ? _obscureText : false,
+              enabled: widget.editable,
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: GoogleFonts.poppins(

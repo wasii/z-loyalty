@@ -8,8 +8,7 @@ import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/models/dashboard_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
-import 'package:loyalty_program/pages/authentication/login/login_page.dart'
-    hide LoginAPI;
+import 'package:loyalty_program/pages/authentication/login/login_page.dart';
 import 'package:loyalty_program/pages/dashboard/claim_points/claim_points.dart';
 import 'package:loyalty_program/pages/dashboard/installation/search_item.dart';
 import 'package:loyalty_program/pages/dashboard/loyalty_rewards/loyalty_rewards.dart';

@@ -5,6 +5,7 @@ import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/table_cell.dart';
 import 'package:loyalty_program/models/my_installation_list_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
+import 'package:loyalty_program/pages/dashboard/installation/view_my_item.dart';
 
 class MyProductList extends StatefulWidget {
   const MyProductList({super.key});
@@ -117,7 +118,15 @@ class _MyProductListState extends State<MyProductList> {
     );
   }
 
-  void editItem(MyProductsInstallation item) {}
+  void editItem(MyProductsInstallation item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewMyItem(isEditable: true, myProduct: item),
+      ),
+    );
+  }
+
   void viewItem(MyProductsInstallation item) {}
   void getMyList() async {
     setState(() => isLoading = true);

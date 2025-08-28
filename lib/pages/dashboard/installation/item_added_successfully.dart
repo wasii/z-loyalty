@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
-import 'package:loyalty_program/models/add_installation_model.dart';
 import 'package:loyalty_program/pages/dashboard/dashboard.dart';
 
 class ItemAddedSuccessfully extends StatelessWidget {
