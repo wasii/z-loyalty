@@ -48,6 +48,7 @@ class _ViewMyItemState extends State<ViewMyItem> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadApiImages();
       if (widget.isEditable) {
         getAllItems();
         loadApiImages();
@@ -56,7 +57,11 @@ class _ViewMyItemState extends State<ViewMyItem> {
 
     IDController.text = widget.myProduct.installationId;
     serialNumberController.text = widget.myProduct.serialNumber;
-
+    addNameController.text = widget.myProduct.clientName;
+    addMobileController.text = widget.myProduct.clientMobile;
+    addItemController.text = widget.myProduct.itemInstalled;
+    addCityController.text = widget.myProduct.installationCity;
+    addAddressController.text = widget.myProduct.installationAddress;
     if (widget.isEditable) {
       addNameController.addListener(_updateButtonState);
       addMobileController.addListener(_updateButtonState);
@@ -65,12 +70,6 @@ class _ViewMyItemState extends State<ViewMyItem> {
       addAddressController.addListener(_updateButtonState);
 
       addRemarksController.addListener(_updateButtonState);
-    } else {
-      addNameController.text = widget.myProduct.clientName;
-      addMobileController.text = widget.myProduct.clientMobile;
-      addItemController.text = widget.myProduct.itemInstalled;
-      addCityController.text = widget.myProduct.installationCity;
-      addAddressController.text = widget.myProduct.installationAddress;
     }
   }
 
@@ -104,6 +103,7 @@ class _ViewMyItemState extends State<ViewMyItem> {
     if (image != null) {
       setState(() {
         selectedImages.add(File(image.path));
+        _updateButtonState(); // Call this to update button state after adding an image
       });
     }
   }
@@ -333,13 +333,16 @@ class _ViewMyItemState extends State<ViewMyItem> {
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: (widget.isEditable
-                                  ? selectedImages.length + 1
+                                  ? (selectedImages.length >= 3
+                                        ? 3
+                                        : selectedImages.length + 1)
                                   : selectedImages.length),
                               separatorBuilder: (_, __) =>
                                   const SizedBox(width: 10),
                               itemBuilder: (context, index) {
-                                // ✅ Agar editable hai to pehle Add Button dikhao
-                                if (widget.isEditable && index == 0) {
+                                if (widget.isEditable &&
+                                    selectedImages.length < 3 &&
+                                    index == selectedImages.length) {
                                   return GestureDetector(
                                     onTap: () {
                                       showModalBottomSheet(
@@ -406,70 +409,75 @@ class _ViewMyItemState extends State<ViewMyItem> {
                                     ),
                                   );
                                 } else {
-                                  // ✅ Image dikhane ka index adjust karo
-                                  final imageIndex = widget.isEditable
-                                      ? index - 1
-                                      : index;
-
-                                  final file =
-                                      selectedImages[imageIndex]; // File hi hamesha hoga
+                                  final imageIndex = index;
+                                  final file = selectedImages[imageIndex];
 
                                   return Padding(
                                     padding: const EdgeInsets.only(
                                       top: 0,
                                       right: 0,
                                     ),
-                                    child: Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showImageFilePopup(context, file);
+                                      },
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            child: Image.file(
+                                              file,
+                                              width: 90,
+                                              height: 90,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                          child: Image.file(
-                                            file,
-                                            width: 90,
-                                            height: 90,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        if (widget
-                                            .isEditable) // ✅ sirf editable mode me delete icon
-                                          Positioned(
-                                            top: -8,
-                                            right: -8,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedImages.removeAt(
-                                                    imageIndex,
-                                                  );
-                                                });
-                                              },
-                                              child: Container(
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.redAccent,
-                                                  shape: BoxShape.circle,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black26,
-                                                      blurRadius: 4,
-                                                      offset: Offset(0, 2),
-                                                    ),
-                                                  ],
-                                                ),
-                                                padding: const EdgeInsets.all(
-                                                  4,
-                                                ),
-                                                child: const Icon(
-                                                  Icons.close,
-                                                  size: 12,
-                                                  color: Colors.white,
+                                          if (widget.isEditable)
+                                            Positioned(
+                                              top: -8,
+                                              right: -8,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedImages.removeAt(
+                                                      imageIndex,
+                                                    );
+                                                    _updateButtonState(); // Call this to update button state after removing an image
+                                                  });
+                                                },
+                                                child: Container(
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        color: Colors.redAccent,
+                                                        shape: BoxShape.circle,
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color:
+                                                                Colors.black26,
+                                                            blurRadius: 4,
+                                                            offset: Offset(
+                                                              0,
+                                                              2,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  padding: const EdgeInsets.all(
+                                                    4,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.close,
+                                                    size: 12,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   );
                                 }
@@ -486,6 +494,62 @@ class _ViewMyItemState extends State<ViewMyItem> {
           ],
         ),
       ),
+    );
+  }
+
+  void showImageFilePopup(BuildContext context, File imageFile) {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // user can dismiss by tapping outside
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: 24,
+          ), // horizontal margin
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    imageFile,
+                    height: 350,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.close, color: kPrimaryColor),
+                  label: Text("Close", style: TextStyle(color: kPrimaryColor)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                    side: BorderSide(color: kPrimaryColor),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

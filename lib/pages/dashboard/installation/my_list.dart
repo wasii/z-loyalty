@@ -127,7 +127,15 @@ class _MyProductListState extends State<MyProductList> {
     );
   }
 
-  void viewItem(MyProductsInstallation item) {}
+  void viewItem(MyProductsInstallation item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewMyItem(isEditable: false, myProduct: item),
+      ),
+    );
+  }
+
   void getMyList() async {
     setState(() => isLoading = true);
 
