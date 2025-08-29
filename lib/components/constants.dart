@@ -53,6 +53,7 @@ const AddInstallation = 'installation_add.php';
 const GetProductList = 'items_list.php';
 const GetMyInstallationList = 'installation_list.php';
 const DeleteSingleFile = 'installation_delete_single_image.php';
+const InstallationEdit = 'installation_edit.php';
 
 //Claim Points
 const GetClaimPoints = 'claim_points_list.php';

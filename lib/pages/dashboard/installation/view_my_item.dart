@@ -1,18 +1,24 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
+import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/image_helper.dart';
 import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/models/add_installation_model.dart';
 import 'package:loyalty_program/models/all_items_model.dart';
 import 'package:loyalty_program/models/delete_single_image_file_model.dart';
+import 'package:loyalty_program/models/item_update_successfully_model.dart';
 import 'package:loyalty_program/models/my_installation_list_model.dart';
 import 'package:loyalty_program/models/user_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:loyalty_program/pages/dashboard/installation/item_added_successfully.dart';
 
 class ViewMyItem extends StatefulWidget {
   final bool isEditable;
@@ -39,6 +45,7 @@ class _ViewMyItemState extends State<ViewMyItem> {
   final TextEditingController addRemarksController = TextEditingController();
 
   List<File> selectedImages = [];
+  List<File> tempImages = [];
 
   bool isButtonEnabled = false;
   bool isLoading = false;
@@ -53,7 +60,6 @@ class _ViewMyItemState extends State<ViewMyItem> {
       loadApiImages();
       if (widget.isEditable) {
         getAllItems();
-        loadApiImages();
       }
     });
 
@@ -72,6 +78,7 @@ class _ViewMyItemState extends State<ViewMyItem> {
       addAddressController.addListener(_updateButtonState);
 
       addRemarksController.addListener(_updateButtonState);
+      _updateButtonState();
     }
   }
 
@@ -111,18 +118,13 @@ class _ViewMyItemState extends State<ViewMyItem> {
   }
 
   Future<void> loadApiImages() async {
-    // API se jo links aati hain unko string list me nikal lo
-    // final urls = uploadPics
-    //     .map<String>((pic) => pic['link_thumbnail'] as String)
-    //     .toList();
     List<String> urls = [];
     for (var linkThumbnail in widget.myProduct.uploadPics) {
       urls.add(linkThumbnail.link);
     }
-    // helper method call karo
     selectedImages = await ImageHelper.downloadImages(urls);
-
-    setState(() {}); // UI update
+    tempImages = List.from(selectedImages);
+    setState(() {});
   }
 
   @override
@@ -501,6 +503,20 @@ class _ViewMyItemState extends State<ViewMyItem> {
                             ],
                           ),
                         ),
+                        SizedBox(height: 20),
+                        if (widget.isEditable)
+                          Container(
+                            color: Colors.white,
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                            child: CustomPrimaryButton(
+                              text: 'Update',
+                              isDisabled: true,
+                              onPressed: () {
+                                onUpdatePressed();
+                              },
+                              showImage: false,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -512,6 +528,175 @@ class _ViewMyItemState extends State<ViewMyItem> {
         ],
       ),
     );
+  }
+
+  void onUpdatePressed() {
+    final tempPaths = tempImages.map((f) => f.path).toSet();
+    final selectedPaths = selectedImages.map((f) => f.path).toSet();
+
+    if (setEquals(tempPaths, selectedPaths)) {
+      // ✅ Case 1: koi farq nahi → same images
+      updateItemWithoutFiles();
+    } else {
+      // ✅ Case 2: find new images (jo API wali list me nahi hain)
+      final newImages = selectedImages
+          .where((file) => !tempPaths.contains(file.path))
+          .toList();
+
+      if (newImages.isNotEmpty) {
+        // Purani API wali images hata do, sirf new wali rakho
+        selectedImages = newImages;
+
+        // ✅ Case 2a: nayi images ke sath update
+        updateItemWithFiles();
+      } else {
+        // ✅ Case 3: sirf delete hui hain, nayi add nahi hui
+        updateItemWithoutFiles();
+      }
+    }
+  }
+
+  void updateItemWithFiles() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+
+      final List<MultipartFile> imageFiles = await Future.wait(
+        selectedImages.map((file) async {
+          final fileName = '${file.path.split('/').last}.jpg'; // 👈 Ensure .jpg
+          return await MultipartFile.fromFile(file.path, filename: fileName);
+        }),
+      );
+
+      final formMap = {
+        'installation_id': widget.myProduct.installationId,
+        'installer_id': 68,
+        'client_name': addNameController.text,
+        'client_mobile': addMobileController.text,
+        'item_id': selectedItem?.id ?? '1',
+        'installation_city': addCityController.text,
+        'installation_address': addAddressController.text,
+        'upload_pics[]': imageFiles,
+      };
+
+      final response = await api.request(
+        path: InstallationEdit,
+        type: RequestType.post,
+        data: formMap,
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final itemUpdate = ItemUpdateSuccessfullyModel.fromJson(json);
+      print("✅ Upload Response: $itemUpdate");
+
+      if (itemUpdate.error == 0) {
+        Navigator.pop(context);
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Update Item Failed"),
+            content: Text(itemUpdate.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // handle success UI, like navigation or snackbar
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Update Item Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void updateItemWithoutFiles() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      final formMap = {
+        'installation_id': widget.myProduct.installationId,
+        'installer_id': 68,
+        'client_name': addNameController.text,
+        'client_mobile': addMobileController.text,
+        'item_id': selectedItem?.id ?? '1',
+        'installation_city': addCityController.text,
+        'installation_address': addAddressController.text,
+      };
+
+      final response = await api.request(
+        path: InstallationEdit,
+        type: RequestType.post,
+        data: formMap,
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final itemUpdate = ItemUpdateSuccessfullyModel.fromJson(json);
+      print("✅ Upload Response: $itemUpdate");
+
+      if (itemUpdate.error == 0) {
+        Navigator.pop(context);
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Update Item Failed"),
+            content: Text(itemUpdate.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // handle success UI, like navigation or snackbar
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Update Item Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   void showImageFilePopup(BuildContext context, File imageFile) {
