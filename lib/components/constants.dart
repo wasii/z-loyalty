@@ -57,6 +57,9 @@ const InstallationEdit = 'installation_edit.php';
 
 //Claim Points
 const GetClaimPoints = 'claim_points_list.php';
+const ClaimCash = 'claim_cash.php';
+const ClaimBike = 'claim_bike.php';
+const ClaimUmrah = 'claim_umrah.php';
 
 //Loyalty Rewards
 const GetLoyaltyRewards = 'loyalty_rewards_list.php';

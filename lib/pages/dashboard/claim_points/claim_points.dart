@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/common_scaffold_layout.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/table_cell.dart';
 import 'package:loyalty_program/models/claim_points_model.dart';
+import 'package:loyalty_program/models/claim_reward_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/authentication/login/login_page.dart';
@@ -156,7 +158,24 @@ class _ClaimPointsState extends State<ClaimPoints> {
                     text: buttonTitles[index],
                     isDisabled: isEnabled,
                     onPressed: () {
-                      showCustomPopup(context, buttonTitles[index]);
+                      showCustomPopup(
+                        context,
+                        buttonTitles[index],
+                        onOk: (remarks) {
+                          if (index == 0) {
+                            claimCash(remarks);
+                            return;
+                          }
+                          if (index == 1) {
+                            claimBike(remarks);
+                            return;
+                          }
+                          if (index == 2) {
+                            claimUmrah(remarks);
+                            return;
+                          }
+                        },
+                      );
                     },
                     showImage: false,
                     buttonHeight: 40,
@@ -176,7 +195,12 @@ class _ClaimPointsState extends State<ClaimPoints> {
     );
   }
 
-  void showCustomPopup(BuildContext context, String message) {
+  void showCustomPopup(
+    BuildContext context,
+    String message, {
+    required Function(String remarks) onOk,
+  }) {
+    var controller = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -192,10 +216,23 @@ class _ClaimPointsState extends State<ClaimPoints> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('Are you sure you want to $message?'),
+
               const SizedBox(height: 20),
+
+              // Sirf ek TextField add kar diya
+              CustomInputField(
+                controller: controller,
+                headingText: 'Remarks',
+                hintText: 'Enter Remarks (Optional)',
+                isRequired: false,
+                textHeight: 57,
+              ),
+
+              const SizedBox(height: 20),
+
               Row(
                 children: [
-                  // Cancel Button (Left - 50%)
+                  // Cancel Button
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -227,10 +264,11 @@ class _ClaimPointsState extends State<ClaimPoints> {
                   ),
                   const SizedBox(width: 10),
 
-                  // OK Button (Right - 50%)
+                  // OK Button
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        onOk(controller.text.trim());
                         Navigator.of(context).pop();
                       },
                       style: ButtonStyle(
@@ -251,7 +289,7 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         ),
                       ),
                       child: Text(
-                        'OK',
+                        'Claim',
                         style: GoogleFonts.poppins(fontSize: 14),
                       ),
                     ),
@@ -292,6 +330,153 @@ class _ClaimPointsState extends State<ClaimPoints> {
         context: context,
         builder: (_) => AlertDialog(
           title: const Text("Claim Points Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void claimCash(String remarks) async {
+    setState(() => isLoading = true);
+    try {
+      final api = ApiService();
+      final response = await api.request(
+        path: GetClaimPoints,
+        type: RequestType.post,
+        data: {'user_id': 65, 'remarks': remarks},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimReward = ClaimRewardModel.fromJson(json);
+      if (claimReward.error == 0) {
+        Navigator.of(context).pop();
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Claim Cash Failed"),
+            content: Text(claimReward.message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Claim Cash Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void claimBike(String remarks) async {
+    setState(() => isLoading = true);
+    try {
+      final api = ApiService();
+      final response = await api.request(
+        path: GetClaimPoints,
+        type: RequestType.post,
+        data: {'user_id': 65, 'remarks': remarks},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimReward = ClaimRewardModel.fromJson(json);
+      if (claimReward.error == 0) {
+        Navigator.of(context).pop();
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Claim Bike Failed"),
+            content: Text(claimReward.message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Claim Bike Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void claimUmrah(String remarks) async {
+    setState(() => isLoading = true);
+    try {
+      final api = ApiService();
+      final response = await api.request(
+        path: GetClaimPoints,
+        type: RequestType.post,
+        data: {'user_id': 65, 'remarks': remarks},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimReward = ClaimRewardModel.fromJson(json);
+      if (claimReward.error == 0) {
+        Navigator.pop(context);
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Claim Umrah Failed"),
+            content: Text(claimReward.message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Claim Umrah Failed"),
           content: Text(e.toString()),
           actions: [
             TextButton(

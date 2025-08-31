@@ -756,11 +756,23 @@ class _ViewMyItemState extends State<ViewMyItem> {
   }
 
   void deleteSingleFile(int imageIndex) async {
+    var filePath = '';
+    String path = (widget.myProduct.uploadPics.length > imageIndex)
+        ? widget.myProduct.uploadPics[imageIndex].filePath
+        : '';
+
+    if (path != '' && path.isNotEmpty) {
+      filePath = path;
+    } else {
+      setState(() {
+        selectedImages.removeAt(imageIndex);
+        _updateButtonState();
+      });
+      return;
+    }
     setState(() {
       isLoading = true;
     });
-    var filePath = widget.myProduct.uploadPics[imageIndex].filePath;
-
     try {
       final api = ApiService();
       final response = await api.request(
