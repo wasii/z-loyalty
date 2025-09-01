@@ -38,6 +38,7 @@ dependencies:
   dio: ^5.4.0
   shared_preferences: ^2.2.2
   image_picker:
+  permission_handler:
 
 dev_dependencies:
   flutter_test:

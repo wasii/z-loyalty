@@ -252,10 +252,11 @@ class _LoyaltyRewardsState extends State<LoyaltyRewards> {
 
     try {
       final api = ApiService();
+      var user = await UserPrefsService.getUser();
       final response = await api.request(
         path: GetLoyaltyRewards,
         type: RequestType.post,
-        data: {'user_id': 65},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 

@@ -27,9 +27,8 @@ class SearchNewItem extends StatefulWidget {
 }
 
 class _SearchNewItemState extends State<SearchNewItem> {
-  final TextEditingController addSerialNumberController = TextEditingController(
-    text: '81ZIGDVD',
-  );
+  final TextEditingController addSerialNumberController =
+      TextEditingController();
 
   bool isButtonEnabled = false;
   bool isLoading = false;

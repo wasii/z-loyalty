@@ -5,6 +5,7 @@ import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/table_cell.dart';
 import 'package:loyalty_program/models/my_installation_list_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/dashboard/installation/view_my_item.dart';
 
 class MyProductList extends StatefulWidget {
@@ -140,11 +141,12 @@ class _MyProductListState extends State<MyProductList> {
     setState(() => isLoading = true);
 
     try {
+      var user = await UserPrefsService.getUser();
       final api = ApiService();
       final response = await api.request(
         path: GetMyInstallationList,
         type: RequestType.post,
-        data: {'user_id': 65},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 

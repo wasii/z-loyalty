@@ -18,6 +18,7 @@ import 'package:loyalty_program/models/my_installation_list_model.dart';
 import 'package:loyalty_program/models/user_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/dashboard/installation/item_added_successfully.dart';
 
 class ViewMyItem extends StatefulWidget {
@@ -148,7 +149,9 @@ class _ViewMyItemState extends State<ViewMyItem> {
             child: Column(
               children: [
                 Text(
-                  'INSTALLATION, VIEW',
+                  widget.isEditable
+                      ? 'INSTALLATION, EDIT'
+                      : 'INSTALLATION VIEW',
                   style: GoogleFonts.poppins(
                     textStyle: TextStyle(
                       fontSize: 20,
@@ -572,7 +575,7 @@ class _ViewMyItemState extends State<ViewMyItem> {
 
       final formMap = {
         'installation_id': widget.myProduct.installationId,
-        'installer_id': 68,
+        'installer_id': user?.id ?? 0,
         'client_name': addNameController.text,
         'client_mobile': addMobileController.text,
         'item_id': selectedItem?.id ?? '1',
@@ -640,7 +643,7 @@ class _ViewMyItemState extends State<ViewMyItem> {
       final api = ApiService();
       final formMap = {
         'installation_id': widget.myProduct.installationId,
-        'installer_id': 68,
+        'installer_id': user?.id ?? 0,
         'client_name': addNameController.text,
         'client_mobile': addMobileController.text,
         'item_id': selectedItem?.id ?? '1',

@@ -167,11 +167,12 @@ class _PointsInventoryHistoryState extends State<PointsInventoryHistory> {
     setState(() => isLoading = true);
 
     try {
+      var user = await UserPrefsService.getUser();
       final api = ApiService();
       final response = await api.request(
         path: GetPointsInventoryHistory,
         type: RequestType.post,
-        data: {'user_id': 65},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 

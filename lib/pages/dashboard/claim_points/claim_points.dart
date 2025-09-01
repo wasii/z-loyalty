@@ -307,11 +307,12 @@ class _ClaimPointsState extends State<ClaimPoints> {
     setState(() => isLoading = true);
 
     try {
+      var user = await UserPrefsService.getUser();
       final api = ApiService();
       final response = await api.request(
         path: GetClaimPoints,
         type: RequestType.post,
-        data: {'user_id': 65},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 
@@ -347,11 +348,12 @@ class _ClaimPointsState extends State<ClaimPoints> {
   void claimCash(String remarks) async {
     setState(() => isLoading = true);
     try {
+      var user = await UserPrefsService.getUser();
       final api = ApiService();
       final response = await api.request(
         path: GetClaimPoints,
         type: RequestType.post,
-        data: {'user_id': 65, 'remarks': remarks},
+        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
         useFormData: true,
       );
 
@@ -396,11 +398,12 @@ class _ClaimPointsState extends State<ClaimPoints> {
   void claimBike(String remarks) async {
     setState(() => isLoading = true);
     try {
+      var user = await UserPrefsService.getUser();
       final api = ApiService();
       final response = await api.request(
         path: GetClaimPoints,
         type: RequestType.post,
-        data: {'user_id': 65, 'remarks': remarks},
+        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
         useFormData: true,
       );
 
@@ -445,11 +448,12 @@ class _ClaimPointsState extends State<ClaimPoints> {
   void claimUmrah(String remarks) async {
     setState(() => isLoading = true);
     try {
+      var user = await UserPrefsService.getUser();
       final api = ApiService();
       final response = await api.request(
         path: GetClaimPoints,
         type: RequestType.post,
-        data: {'user_id': 65, 'remarks': remarks},
+        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
         useFormData: true,
       );
 

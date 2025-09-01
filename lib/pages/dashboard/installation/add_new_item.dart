@@ -16,6 +16,7 @@ import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/dashboard/installation/item_added_successfully.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class AddNewItem extends StatefulWidget {
   final String serialNumber;
@@ -26,6 +27,43 @@ class AddNewItem extends StatefulWidget {
 }
 
 class _AddNewItemState extends State<AddNewItem> {
+  Future<bool> requestPermissions() async {
+    var cameraStatus = await Permission.camera.request();
+    var photosStatus = await Permission.photos.request();
+
+    if (cameraStatus.isGranted && photosStatus.isGranted) {
+      print("All permissions granted ✅");
+      return true;
+    } else {
+      print("Permissions denied ❌");
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Permission Required"),
+          content: const Text(
+            "Please enable Camera and Photo access from Settings.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                openAppSettings();
+              },
+              child: const Text("Open Settings"),
+            ),
+          ],
+        ),
+      );
+      return false;
+    }
+  }
+
   final TextEditingController serialNumberController = TextEditingController();
   final TextEditingController addNameController = TextEditingController();
   final TextEditingController addMobileController = TextEditingController();
@@ -69,6 +107,10 @@ class _AddNewItemState extends State<AddNewItem> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    // bool granted = await requestPermissions();
+    // if (!granted) {
+    //   return;
+    // }
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: source);
     if (image != null) {
@@ -143,8 +185,9 @@ class _AddNewItemState extends State<AddNewItem> {
                           controller: serialNumberController,
                           headingText: "Serial Number",
                           hintText: 'Enter Serial Number',
-                          isRequired: true,
+                          isRequired: false,
                           textHeight: 57,
+                          editable: false,
                         ),
                         CustomInputField(
                           controller: addNameController,
@@ -159,6 +202,7 @@ class _AddNewItemState extends State<AddNewItem> {
                           hintText: 'Enter your mobile number',
                           isRequired: true,
                           textHeight: 57,
+                          editable: false,
                         ),
                         GestureDetector(
                           onTap: () async {
@@ -491,7 +535,7 @@ class _AddNewItemState extends State<AddNewItem> {
       );
 
       final formMap = {
-        'user_id': 68,
+        'user_id': user?.id ?? 0,
         'serial_number': widget.serialNumber,
         'client_name': user?.username,
         'client_mobile': user?.contactNos,
