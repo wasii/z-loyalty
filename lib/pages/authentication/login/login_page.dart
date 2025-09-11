@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loyalty_program/components/app_text_field.dart';
+import 'package:loyalty_program/components/authentication_header.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield_with_icon.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
@@ -77,193 +79,140 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildMainContent(double screenHeight, bool shouldScroll) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('${kLogoFolder}app_background.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: shouldScroll
-                        ? const BouncingScrollPhysics()
-                        : const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 30,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              '${kLogoFolder}ziewnic_vertical_logo.png',
-                              height: 150,
-                            ),
-                            const SizedBox(height: 30),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "LOYALTY",
-                                  style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 40,
-                                      height: 1.0,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  "PROGRAM",
-                                  style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                      fontSize: 37,
-                                      height: 0.9,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 40),
-                            CustomInputFieldWithIcon(
-                              controller: usernameController,
-                              hintText: 'Username',
-                              imageAssetPath: '${kIconFolder}user_icon.png',
-                            ),
-                            const SizedBox(height: 20),
-                            CustomInputFieldWithIcon(
-                              controller: passwordController,
-                              hintText: 'Password',
-                              imageAssetPath: '${kIconFolder}lock_icon.png',
-                            ),
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: rememberMe,
-                                  onChanged: (value) {
-                                    setState(() => rememberMe = value!);
-                                  },
-                                  activeColor: kPrimaryColor,
-                                  checkColor: Colors.white,
-                                ),
-                                Text(
-                                  "Remember me",
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                      color: kDefaultTextFieldColor,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            CustomPrimaryButton(
-                              text: 'Login',
-                              isDisabled: isButtonEnabled,
-                              onPressed: isButtonEnabled
-                                  ? () async {
-                                      login();
-                                    }
-                                  : null,
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ForgetPasswordPage(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                "Forgot Password?",
-                                style: GoogleFonts.poppins(
-                                  textStyle: const TextStyle(
-                                    fontSize: 16,
-                                    decoration: TextDecoration.underline,
-                                    color: Color(0xFF000000),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Don’t have account?",
-                                  style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const RegistrationPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "REGISTER NOW",
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: kPrimaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Logo aur Loyalty Program text
+              AuthenticationHeader(),
+              const SizedBox(height: 60),
+              Text(
+                "Log in",
+                style: GoogleFonts.inter(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Log in and shine with rewards that brighten your day",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 32),
+              // Username field
+              AppTextField(
+                controller: usernameController,
+                hintText: "Enter your username",
+                prefixImage: "username_icon.png",
+              ),
+              const SizedBox(height: 16),
+
+              // Password field
+              AppTextField(
+                controller: passwordController,
+                hintText: "Enter your password",
+                prefixImage: "password_icon.png",
+                isPassword: true,
+              ),
+              const SizedBox(height: 12),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        "UAN ",
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      Checkbox(
+                        value: rememberMe,
+                        activeColor: kPrimaryColor,
+                        onChanged: (val) {
+                          setState(() {
+                            rememberMe = val ?? false;
+                          });
+                        },
                       ),
                       Text(
-                        "021 111 000 666  |  www.ziewnic.com",
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(fontSize: 16),
+                        "Remember me",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500, // 👈 Medium
+                          color: kTextFieldPlaceholderColor,
                         ),
                       ),
                     ],
                   ),
+                  TextButton(
+                    onPressed: () {
+                      // Forgot password action
+                    },
+                    child: Text(
+                      "Forgot password?",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: kPrimaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              // Login button
+              SizedBox(
+                height: 62,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Login action
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "Log in",
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ],
-            );
-          },
+              ),
+              const SizedBox(height: 24),
+              // Register link
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don’t have an account? ",
+                    style: GoogleFonts.inter(fontSize: 14),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Register action
+                    },
+                    child: Text(
+                      "Register Now",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: kPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

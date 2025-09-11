@@ -9,7 +9,8 @@ const kPrimaryColorString = '7FA53F';
 const kPrimaryColor = Color(0xFF7FA53F);
 
 //TextFields
-const kTextFieldBackgroundColor = Color(0xFFD9D9D9);
+const kTextFieldBackgroundColor = Color(0xFFF5F5F5);
+const kTextFieldPlaceholderColor = Color(0xFF777777);
 const kTextFieldTextColor = Color(0xFFA09D98);
 const kTextFieldHeadingNameColor = Color(0xFF383737);
 const kTextFieldMandatoryColor = Color(0xFFFF0000);
