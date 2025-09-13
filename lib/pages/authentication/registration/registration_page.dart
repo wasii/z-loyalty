@@ -236,9 +236,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             PrimaryButton(
                               text: 'Sign Up',
                               onPressed: () {
-                                userregistration();
+                                // userregistration();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const RegistrationSuccessful(),
+                                  ),
+                                );
                               },
-                              enabled: isButtonEnabled,
+                              enabled: true,
                             ),
                             const SizedBox(height: 10),
                             Row(
