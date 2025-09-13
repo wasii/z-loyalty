@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/app_text_field.dart';
 import 'package:loyalty_program/components/authentication_header.dart';
+import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield_with_icon.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
+import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/user_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
@@ -65,13 +68,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             _buildMainContent(screenHeight, shouldScroll),
 
-            if (isLoading)
-              Container(
-                color: Colors.black.withAlpha(50),
-                child: const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                ),
-              ),
+            if (isLoading) Loader(),
           ],
         ),
       ),
@@ -83,33 +80,22 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Logo aur Loyalty Program text
               AuthenticationHeader(),
-              const SizedBox(height: 60),
-              Text(
-                "Log in",
-                style: GoogleFonts.inter(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+              AuthenticationHeaderText(
+                title: 'Log in',
+                subtitle:
+                    'Log in and shine with rewards that brighten your day',
               ),
-              const SizedBox(height: 8),
-              Text(
-                "Log in and shine with rewards that brighten your day",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 32),
               // Username field
               AppTextField(
                 controller: usernameController,
                 hintText: "Enter your username",
-                prefixImage: "username_icon.png",
+                prefixImage: "iconusername.png",
               ),
               const SizedBox(height: 16),
 
@@ -117,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
               AppTextField(
                 controller: passwordController,
                 hintText: "Enter your password",
-                prefixImage: "password_icon.png",
+                prefixImage: "iconpassword.png",
                 isPassword: true,
               ),
               const SizedBox(height: 12),
@@ -163,29 +149,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
               // Login button
-              SizedBox(
-                height: 62,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Login action
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    "Log in",
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+              PrimaryButton(
+                text: 'Login',
+                onPressed: () {
+                  login();
+                },
+                enabled: isButtonEnabled,
               ),
               const SizedBox(height: 24),
               // Register link
@@ -198,7 +167,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Register action
+                      print("Register Now tapped!");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RegistrationPage(),
+                        ),
+                      );
                     },
                     child: Text(
                       "Register Now",

@@ -2,10 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loyalty_program/components/app_text_field.dart';
+import 'package:loyalty_program/components/authentication_header.dart';
+import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/check_username_model.dart';
 import 'package:loyalty_program/models/user_registration_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
@@ -24,6 +28,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController whatsappNumberController =
       TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -53,6 +58,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     passwordController.addListener(_updateButtonState);
     confirmPasswordController.addListener(_updateButtonState);
     whatsappNumberController.addListener(_updateButtonState);
+    phoneNumberController.addListener(_updateButtonState);
     emailController.addListener(_updateButtonState);
     cityController.addListener(_updateButtonState);
     experienceInYearsController.addListener(_updateButtonState);
@@ -72,6 +78,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           userNameController.text.isNotEmpty &&
           passwordController.text.isNotEmpty &&
           confirmPasswordController.text.isNotEmpty &&
+          phoneNumberController.text.isNotEmpty &&
           cityController.text.isNotEmpty &&
           experienceInYearsController.text.isNotEmpty &&
           addressController.text.isNotEmpty &&
@@ -85,6 +92,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     userNameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    phoneNumberController.dispose();
     whatsappNumberController.dispose();
     emailController.dispose();
     cityController.dispose();
@@ -102,215 +110,160 @@ class _RegistrationPageState extends State<RegistrationPage> {
       },
       behavior: HitTestBehavior.opaque,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('${kLogoFolder}app_background_2.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 32,
+                ),
                 child: Column(
                   children: [
-                    const SizedBox(height: 5),
-                    // Top logo + text
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Image.asset(
-                          '${kLogoFolder}ziewnic_horizontal_logo.png',
-                          height: 40,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              "LOYALTY",
-                              style: GoogleFonts.poppins(
-                                textStyle: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 21,
-                                  height: 1.0,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              "PROGRAM",
-                              style: GoogleFonts.poppins(
-                                textStyle: const TextStyle(
-                                  fontSize: 19,
-                                  height: 0.9,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                    AuthenticationHeader(),
+                    AuthenticationHeaderText(
+                      title: 'Sign up',
+                      subtitle:
+                          'Create your account and enjoy a rewarding experience',
                     ),
-                    const SizedBox(height: 30),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Register",
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
                     Expanded(
                       child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Column(
-                            children: [
-                              CustomInputField(
-                                controller: nameController,
-                                headingText: 'Name',
-                                hintText: 'Type Full Name',
-                                isRequired: true,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: userNameController,
-                                headingText: 'Username',
-                                hintText: 'Type username',
-                                isRequired: true,
-                                textHeight: 57,
-                                keyboardType: TextInputType.phone,
-                                focusNode: userFocusNode,
-                              ),
-                              CustomInputField(
-                                controller: passwordController,
-                                headingText: 'Password',
-                                hintText: 'Type Password',
-                                isRequired: true,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: confirmPasswordController,
-                                headingText: 'Confirm Password',
-                                hintText: 'Confirm Password',
-                                isRequired: true,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: cityController,
-                                headingText: 'City',
-                                hintText: 'Type Your City',
-                                isRequired: true,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: experienceInYearsController,
-                                headingText: 'Experience in Years',
-                                hintText: 'Type username',
-                                isRequired: true,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: addressController,
-                                headingText: 'Address',
-                                hintText: 'Type Address',
-                                isRequired: true,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: emailController,
-                                headingText: 'Email',
-                                hintText: 'Type Email Address',
-                                isRequired: false,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: whatsappNumberController,
-                                headingText: 'Whatsapp Number',
-                                hintText: 'Type Whatsapp Number',
-                                isRequired: false,
-                                textHeight: 57,
-                              ),
-
-                              // CustomInputField(
-                              //   controller: userNameController,
-                              //   headingText: 'Visiting Card Picture',
-                              //   hintText: 'Tap to Add Media',
-                              //   isRequired: false,
-                              //   textHeight: 150,
-                              // ),
-                              CustomInputField(
-                                controller: easyPaisaController,
-                                headingText: 'Easy Paisa',
-                                hintText: 'Type Easy Paisa Details',
-                                isRequired: false,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: jazzCashController,
-                                headingText: 'Jazz Cash',
-                                hintText: 'Type Jazz Cash Details',
-                                isRequired: false,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: bankDetailsController,
-                                headingText: 'Bank Account',
-                                hintText: 'Type Bank Account Details',
-                                isRequired: false,
-                                textHeight: 57,
-                              ),
-                              CustomInputField(
-                                controller: remarksController,
-                                headingText: 'Remarks',
-                                hintText: '',
-                                isRequired: false,
-                                textHeight: 57,
-                              ),
-                              SizedBox(height: 20),
-                              CustomPrimaryButton(
-                                text: 'Register',
-                                isDisabled: isButtonEnabled,
-                                onPressed: () {
-                                  userregistration();
-                                },
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Already have an account?",
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(fontSize: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppTextField(
+                              controller: nameController,
+                              hintText: "Enter your Full name",
+                              prefixImage: "iconusername.png",
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: userNameController,
+                              hintText: "Enter your Username",
+                              prefixImage: "iconusername.png",
+                              keyboardType: TextInputType.phone,
+                              focusNode: userFocusNode,
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: passwordController,
+                              hintText: "Enter your Password",
+                              prefixImage: "iconpassword.png",
+                              isPassword: true,
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: confirmPasswordController,
+                              hintText: "Confirm Password",
+                              prefixImage: "iconpassword.png",
+                              isPassword: true,
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 120, // 👈 first field ka fixed width
+                                  child: AppTextField(
+                                    controller: passwordController,
+                                    hintText: "92",
+                                    prefixImage: "iconpakistan.png",
+                                    suffixImage: "icondropdown.png",
+                                    editable: false,
+                                  ),
+                                ),
+                                const SizedBox(width: 5), // spacing
+                                Expanded(
+                                  child: AppTextField(
+                                    controller: phoneNumberController,
+                                    hintText: "Enter Phone number",
+                                    prefixImage: "iconphonenumber.png",
+                                    keyboardType: TextInputType.phone,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: emailController,
+                              hintText: "Enter your Email Address",
+                              prefixImage: "iconmessage.png",
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: cityController,
+                              hintText: "City",
+                              prefixImage: "iconlocation.png",
+                              suffixImage: "icondropdown.png",
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: experienceInYearsController,
+                              hintText: "Experience in years",
+                              prefixImage: "iconpassword.png",
+                              keyboardType: TextInputType.number,
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: experienceInYearsController,
+                              hintText: "Enter your Full Address",
+                              prefixImage: "iconaddress.png",
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: easyPaisaController,
+                              hintText: "Easypaisa Account Details",
+                              prefixImage: "iconcard.png",
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: jazzCashController,
+                              hintText: "Jazzcash Account Details",
+                              prefixImage: "iconcard.png",
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: bankDetailsController,
+                              hintText: "Bank Account Details",
+                              prefixImage: "iconcard.png",
+                            ),
+                            const SizedBox(height: 16),
+                            AppTextField(
+                              controller: remarksController,
+                              hintText: "Enter your remarks",
+                              prefixImage: "iconchat.png",
+                            ),
+                            const SizedBox(height: 16),
+                            PrimaryButton(
+                              text: 'Sign Up',
+                              onPressed: () {
+                                userregistration();
+                              },
+                              enabled: isButtonEnabled,
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Do you already have an account? ",
+                                  style: GoogleFonts.inter(fontSize: 14),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    "Login Now",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      color: kPrimaryColor,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      "SIGN IN",
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: kPrimaryColor,
-                                        ),
-                                      ),
-                                    ), // TextStyle(decoration: TextDecoration.underline)),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 40), // Bottom spacing
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -318,7 +271,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
               ),
             ),
-            if (isLoading) Loader(),
           ],
         ),
       ),
@@ -326,6 +278,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   void checkUsername() async {
+    if (userNameController.text.isEmpty) {
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => isLoading = true);
 

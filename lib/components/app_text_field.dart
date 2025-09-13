@@ -8,6 +8,9 @@ class AppTextField extends StatefulWidget {
   final String? prefixImage; // 👈 sirf image name
   final String? suffixImage; // 👈 sirf image name
   final bool isPassword;
+  final TextInputType keyboardType; // 👈 naya field
+  final FocusNode? focusNode;
+  final bool editable;
 
   const AppTextField({
     Key? key,
@@ -16,6 +19,9 @@ class AppTextField extends StatefulWidget {
     this.prefixImage,
     this.suffixImage,
     this.isPassword = false,
+    this.keyboardType = TextInputType.text,
+    this.focusNode,
+    this.editable = true,
   }) : super(key: key);
 
   @override
@@ -29,7 +35,7 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
+    _focusNode = widget.focusNode ?? FocusNode();
     _focusNode.addListener(() {
       setState(() {}); // rebuild on focus change
     });
@@ -37,7 +43,9 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    if (widget.focusNode == null) {
+      _focusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -71,12 +79,16 @@ class _AppTextFieldState extends State<AppTextField> {
       );
     }
     if (widget.suffixImage != null) {
-      return Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Image.asset(
-          "$kIconFolder${widget.suffixImage!}",
-          height: 20,
-          width: 20,
+      return SizedBox(
+        width: 5, // desired width
+        height: 5, // desired height
+        child: Center(
+          child: Image.asset(
+            "$kIconFolder${widget.suffixImage!}",
+            width: 10,
+            height: 10,
+            fit: BoxFit.contain,
+          ),
         ),
       );
     }
@@ -109,7 +121,9 @@ class _AppTextFieldState extends State<AppTextField> {
       child: TextField(
         focusNode: _focusNode,
         controller: widget.controller,
+        keyboardType: widget.keyboardType,
         obscureText: widget.isPassword ? _obscureText : false,
+        enabled: widget.editable,
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: GoogleFonts.inter(
