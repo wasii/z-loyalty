@@ -6,8 +6,6 @@ import 'package:loyalty_program/components/app_text_field.dart';
 import 'package:loyalty_program/components/authentication_header.dart';
 import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
-import 'package:loyalty_program/components/custom_input_textfield.dart';
-import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/check_username_model.dart';
@@ -278,6 +276,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
               ),
             ),
+            if (isLoading) Loader(),
           ],
         ),
       ),

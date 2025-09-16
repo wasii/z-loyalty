@@ -134,7 +134,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Forgot password action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ForgetPasswordPage(),
+                        ),
+                      );
                     },
                     child: Text(
                       "Forgot password?",

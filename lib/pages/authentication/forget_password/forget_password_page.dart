@@ -2,9 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loyalty_program/components/app_text_field.dart';
+import 'package:loyalty_program/components/authentication_header.dart';
+import 'package:loyalty_program/components/authentication_header_text.dart'
+    show AuthenticationHeaderText;
 import 'package:loyalty_program/components/constants.dart';
-import 'package:loyalty_program/components/custom_input_textfield.dart';
 import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/forgot_passwrod_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/otp_screen/enter_otp_page.dart';
@@ -28,12 +32,15 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   }
 
   void _updateButtonState() {
+    // setState(() {
+    //   final text = phoneNumberController.text;
+    //   isButtonEnabled = text.isNotEmpty;
+    //   if (isButtonEnabled) {
+    //     FocusScope.of(context).unfocus();
+    //   }
+    // });
     setState(() {
-      final text = phoneNumberController.text;
-      isButtonEnabled = text.isNotEmpty && text.length == 11;
-      if (isButtonEnabled) {
-        FocusScope.of(context).unfocus();
-      }
+      isButtonEnabled = phoneNumberController.text.isNotEmpty;
     });
   }
 
@@ -49,112 +56,50 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('${kLogoFolder}app_background_2.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 5),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero, // No extra padding
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        elevation: 0,
-                        shape:
-                            const CircleBorder(), // optional: makes it circular
-                        minimumSize: Size(40, 40), // Make it same as image size
-                      ),
-                      child: Image.asset(
-                        '${kIconFolder}back_button.png',
-                        height: 40,
-                      ),
-                    ),
+                  AuthenticationHeader(),
+                  AuthenticationHeaderText(
+                    title: 'Forgot Password?',
+                    subtitle:
+                        'If you’ve forgotten your password, enter your email below',
                   ),
-                  SizedBox(height: 30),
-                  Text(
-                    "Forget Password",
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    "Please enter your phone number to reset the password",
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(fontSize: 13),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  CustomInputField(
+                  AppTextField(
                     controller: phoneNumberController,
-                    headingText: 'Phone Number',
-                    hintText: 'Enter Your Phone Number',
-                    isRequired: true,
-                    textHeight: 54,
-                    keyboardType: TextInputType.phone,
+                    hintText: "Enter your email address",
+                    prefixImage: "iconmessage.png",
                   ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: isButtonEnabled
-                          ? () {
-                              forgotPassword();
-                            }
-                          : null,
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                          (states) {
-                            if (states.contains(WidgetState.disabled)) {
-                              return kDefaultDisabledButtonColor;
-                            }
-                            return kPrimaryColor;
-                          },
-                        ),
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 20),
+                  PrimaryButton(
+                    text: 'Confirm',
+                    onPressed: () {
+                      // forgotPassword();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EnterOTPPage(
+                            phoneNumber: phoneNumberController.text,
                           ),
                         ),
-                        foregroundColor: WidgetStateProperty.all<Color>(
-                          Colors.white,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(width: 24),
-                          Text(
-                            "Reset Password",
-                            style: GoogleFonts.poppins(
-                              textStyle: const TextStyle(fontSize: 24),
-                            ),
-                          ),
-                          Image.asset(
-                            '${kIconFolder}forward_arrow.png',
-                            height: 24,
-                            width: 24,
-                          ),
-                        ],
+                      );
+                    },
+                    enabled: isButtonEnabled,
+                  ),
+                  const SizedBox(height: 0),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "Back to Login",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: kPrimaryColor,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
