@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loyalty_program/components/authentication_header.dart';
+import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_otp_fields.dart';
 import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/loader.dart';
+import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/send_otp_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/update_password/update_new_password.dart';
@@ -69,69 +72,28 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('${kLogoFolder}app_background_2.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 5),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        elevation: 0,
-                        shape: const CircleBorder(),
-                        minimumSize: Size(40, 40),
-                      ),
-                      child: Image.asset(
-                        '${kIconFolder}back_button.png',
-                        height: 40,
-                      ),
-                    ),
+                  AuthenticationHeader(),
+                  AuthenticationHeaderText(
+                    title: 'Enter OTP',
+                    subtitle: 'Enter the 5-digit OTP code that we sent to',
                   ),
-                  SizedBox(height: 30),
-                  Text(
-                    "Check your inbox",
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 18,
+                  Transform.translate(
+                    offset: const Offset(0, -25),
+                    child: Text(
+                      widget.phoneNumber,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text.rich(
-                    TextSpan(
-                      text: 'We have sent the verification code on ',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(fontSize: 13),
-                      ),
-                      children: [
-                        TextSpan(
-                          text: widget.phoneNumber,
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 30),
+
                   OTPInputWidget(
                     onCompleted: (code) {
                       print("OTP entered: $code");
@@ -139,10 +101,9 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                     onChanged: handleOTPChanged,
                   ),
                   SizedBox(height: 30),
-                  CustomPrimaryButton(
-                    text: 'Verify Code',
-                    isDisabled: isButtonEnabled,
-                    showImage: true,
+
+                  PrimaryButton(
+                    text: 'Verify',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -152,50 +113,40 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                       );
                     },
                   ),
-                  SizedBox(height: 20),
                   Center(
-                    child: Text(
-                      isResendEnabled
-                          ? "You can now resend the code."
-                          : "Resend code in 00:${secondsRemaining.toString().padLeft(2, '0')}",
-                      style: GoogleFonts.poppins(
-                        textStyle: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Didn't receive OTP?",
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: isResendEnabled
-                            ? () {
-                                resendOTP();
-                              }
-                            : null,
-                        child: Text(
-                          "Resend code",
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "00:${secondsRemaining.toString().padLeft(2, '0')} ",
                           style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: isResendEnabled
-                                  ? kPrimaryColor
-                                  : Colors.grey,
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                        TextButton(
+                          onPressed: isResendEnabled
+                              ? () {
+                                  resendOTP();
+                                }
+                              : null,
+                          child: Text(
+                            "Resend Code",
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                                color: isResendEnabled
+                                    ? kPrimaryColor // ✅ enabled = primary color
+                                    : Colors.grey, // ✅ disabled = gray
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

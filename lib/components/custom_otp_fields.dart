@@ -26,7 +26,10 @@ class _OTPInputWidgetState extends State<OTPInputWidget> {
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(widget.length, (_) => TextEditingController());
+    _controllers = List.generate(
+      widget.length,
+      (_) => TextEditingController(text: "-"),
+    );
     _focusNodes = List.generate(widget.length, (_) => FocusNode());
   }
 
@@ -42,21 +45,25 @@ class _OTPInputWidgetState extends State<OTPInputWidget> {
   }
 
   void _handleChange(String value, int index) {
-    final code = _controllers.map((c) => c.text).join();
-    widget.onChanged?.call(code);
+    if (value == "-") return;
+
     if (value.length > 1) {
       value = value.substring(value.length - 1);
       _controllers[index].text = value;
     }
 
+    final code = _controllers.map((c) => c.text).join();
+    widget.onChanged?.call(code);
+
     if (value.isNotEmpty) {
       if (index < widget.length - 1) {
         _focusNodes[index + 1].requestFocus();
       } else {
-        final allFilled = _controllers.every((c) => c.text.isNotEmpty);
+        final allFilled = _controllers.every(
+          (c) => c.text.isNotEmpty && c.text != "-",
+        );
         if (allFilled) {
           _focusNodes[index].unfocus();
-          final code = _controllers.map((c) => c.text).join();
           widget.onCompleted(code);
         }
       }
@@ -67,11 +74,13 @@ class _OTPInputWidgetState extends State<OTPInputWidget> {
   void _handleKeyPress(RawKeyEvent event, int index) {
     if (event is RawKeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.backspace) {
-      if (_controllers[index].text.isEmpty && index > 0) {
-        _controllers[index - 1].clear();
-        _focusNodes[index - 1].requestFocus();
-      } else if (_controllers[index].text.isNotEmpty) {
-        _controllers[index].clear();
+      if (_controllers[index].text.isEmpty || _controllers[index].text == "-") {
+        if (index > 0) {
+          _controllers[index - 1].text = "-";
+          _focusNodes[index - 1].requestFocus();
+        }
+      } else {
+        _controllers[index].text = "-";
       }
       setState(() {});
     }
@@ -82,22 +91,37 @@ class _OTPInputWidgetState extends State<OTPInputWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(widget.length, (index) {
+        bool isActive =
+            _focusNodes[index].hasFocus ||
+            (_controllers[index].text.isNotEmpty &&
+                _controllers[index].text != "-");
+
         return Container(
-          width: 51,
-          height: 54,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: 60,
+          height: 55,
+          margin: const EdgeInsets.symmetric(horizontal: 1),
           decoration: BoxDecoration(
-            color: _controllers[index].text.isNotEmpty
-                ? kPrimaryColor
-                : kTextFieldBackgroundColor,
+            color: kTextFieldBackgroundColor,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(50),
-                blurRadius: 2,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color:
+                  _controllers[index].text.isNotEmpty &&
+                      _controllers[index].text != "-"
+                  ? kPrimaryColor
+                  : Colors.transparent,
+              width: 1.5,
+            ),
+            boxShadow:
+                _controllers[index].text.isNotEmpty &&
+                    _controllers[index].text != "-"
+                ? [
+                    BoxShadow(
+                      color: kPrimaryColor.withAlpha(100),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : [],
           ),
           child: RawKeyboardListener(
             focusNode: FocusNode(),
@@ -109,21 +133,23 @@ class _OTPInputWidgetState extends State<OTPInputWidget> {
               textAlign: TextAlign.center,
               maxLength: 1,
               style: GoogleFonts.poppins(
-                textStyle: const TextStyle(
+                textStyle: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: _controllers[index].text == "-"
+                      ? Colors.grey
+                      : kPrimaryColor,
                 ),
               ),
               decoration: const InputDecoration(
                 counterText: '',
-                border: InputBorder.none, // 🚫 No border
+                border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
                 disabledBorder: InputBorder.none,
                 errorBorder: InputBorder.none,
                 focusedErrorBorder: InputBorder.none,
-                fillColor: Colors.transparent, // Just for safety
+                fillColor: Colors.transparent,
                 filled: true,
               ),
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
