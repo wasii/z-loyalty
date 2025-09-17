@@ -5,7 +5,6 @@ import 'package:loyalty_program/components/authentication_header.dart';
 import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_otp_fields.dart';
-import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/send_otp_model.dart';
