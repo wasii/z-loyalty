@@ -10,11 +10,11 @@
 		</data>
 		<key>flutter_assets/AssetManifest.bin</key>
 		<data>
-		2HAG64eA8JY00y5RYnoK01OWRQo=
+		16nyqQL9U6pd+ki30a7DrnVQWG8=
 		</data>
 		<key>flutter_assets/AssetManifest.json</key>
 		<data>
-		KUZy3B3qbwFFjfe1/0crU4+rvLk=
+		HBb9seZtiHtivFHOObvVYj5Rgog=
 		</data>
 		<key>flutter_assets/FontManifest.json</key>
 		<data>
@@ -36,9 +36,33 @@
 		<data>
 		g4NQ6MuPdv63g2ZaScJl+/5Jb+I=
 		</data>
+		<key>flutter_assets/assets/images/bg/dummy_picture.png</key>
+		<data>
+		+wbfDLYCAWk8kwulCaSk8JzRfao=
+		</data>
 		<key>flutter_assets/assets/images/bg/reward1.png</key>
 		<data>
 		16OT8odcG0czxRXRC2crjxZNbCc=
+		</data>
+		<key>flutter_assets/assets/images/icons/Ticonaccount.png</key>
+		<data>
+		wvE3D+QYPlBD8WQSqlS7/75d0xk=
+		</data>
+		<key>flutter_assets/assets/images/icons/Ticondashboard.png</key>
+		<data>
+		VZr90tUqLNkc04OB3nVo+AuGnS0=
+		</data>
+		<key>flutter_assets/assets/images/icons/Ticonluckydraw.png</key>
+		<data>
+		VZr90tUqLNkc04OB3nVo+AuGnS0=
+		</data>
+		<key>flutter_assets/assets/images/icons/Ticonrewards.png</key>
+		<data>
+		062IZxTLadZYnpbjm9xDvVPSiiQ=
+		</data>
+		<key>flutter_assets/assets/images/icons/Ticonscan.png</key>
+		<data>
+		Q5MPqn/v34HMi4M6S0H3G9Iu0Vc=
 		</data>
 		<key>flutter_assets/assets/images/icons/back_button.png</key>
 		<data>
@@ -64,9 +88,17 @@
 		<data>
 		wReC8OinnSFsgMg/ycIC9Cg6lUg=
 		</data>
+		<key>flutter_assets/assets/images/icons/iconbike.png</key>
+		<data>
+		HzRlIA7W9dMJzo1E6ZQQR50JrDA=
+		</data>
 		<key>flutter_assets/assets/images/icons/iconcard.png</key>
 		<data>
 		c3HlNv8orlHxIkCMl4hAjb9j2WM=
+		</data>
+		<key>flutter_assets/assets/images/icons/iconcash.png</key>
+		<data>
+		JDeAEBFQfmkiQRhv09Z8szMYWGU=
 		</data>
 		<key>flutter_assets/assets/images/icons/iconchat.png</key>
 		<data>
@@ -75,6 +107,10 @@
 		<key>flutter_assets/assets/images/icons/icondropdown.png</key>
 		<data>
 		RGIhG+NVVwwRGWUa6QUgD9X0LaE=
+		</data>
+		<key>flutter_assets/assets/images/icons/iconhamburger.png</key>
+		<data>
+		hzsFAflCB8RSKm0e1xG64alXXg8=
 		</data>
 		<key>flutter_assets/assets/images/icons/iconlocation.png</key>
 		<data>
@@ -100,6 +136,10 @@
 		<data>
 		aekF2rca59GnGm8Ag7FboP9u/RU=
 		</data>
+		<key>flutter_assets/assets/images/icons/iconumrah.png</key>
+		<data>
+		rUe6rGE5y1dNOgPbWUucPIvDz8g=
+		</data>
 		<key>flutter_assets/assets/images/icons/iconusername.png</key>
 		<data>
 		X65Zl4/oZFdCY3AKwpzxQ6kU3k0=
@@ -124,6 +164,10 @@
 		<data>
 		EJyJfClfzC8GW4Xw+f7NXtKk0es=
 		</data>
+		<key>flutter_assets/assets/images/logos/ziewnic-white-logo.png</key>
+		<data>
+		SHV/SuJ6jPkB6CGJOr+1WtqIOYg=
+		</data>
 		<key>flutter_assets/assets/images/logos/ziewnic_horizontal_logo.png</key>
 		<data>
 		bf/8uIh9xlJOiyc64NzmPPGw4mc=
@@ -142,7 +186,7 @@
 		</data>
 		<key>flutter_assets/kernel_blob.bin</key>
 		<data>
-		T0GEBnC8XiSCGJ4nqrZGJR3eRdA=
+		HomXwP9aEDAow2xVoGZakk1ENcc=
 		</data>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -163,14 +207,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			+lAXEPB+QHDL4zOAcsASzbr3pkBXOKCIRgpc4VnXzyM=
+			CoJT1V4kx+Pyz/vzddQ+loAwItA9QFrZyyPPP9SK0w0=
 			</data>
 		</dict>
 		<key>flutter_assets/AssetManifest.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			fF1AdbpO4t3TF+rUctW3cEya9c7m9rCTMGobSiiXtfw=
+			6fdxousiQkooARh14PbCvImVGNMT3myJYI7o2m3ZPzY=
 			</data>
 		</dict>
 		<key>flutter_assets/FontManifest.json</key>
@@ -208,11 +252,53 @@
 			MdN7RIyXx6BlXB7aEDnMFJVMEXilwXYDsPFjSB0AZZ8=
 			</data>
 		</dict>
+		<key>flutter_assets/assets/images/bg/dummy_picture.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			RVXu3YeD3BM0c5EgoQDALIb8dSi2jlBDo2F+ew0MxKE=
+			</data>
+		</dict>
 		<key>flutter_assets/assets/images/bg/reward1.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			Q6fmHSdjlNJxgMRGY9RVLrvnvnqv7ijXQtN8xNB/v9M=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/icons/Ticonaccount.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ewNLMLAJ2cjbiCXQMs3kUWFkgH7CGs3LffKsfvdOGio=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/icons/Ticondashboard.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			CzwWW0dvsGYZxMrPzuqk4+L6nZzw1g5NghwsnNJv7Kc=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/icons/Ticonluckydraw.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			CzwWW0dvsGYZxMrPzuqk4+L6nZzw1g5NghwsnNJv7Kc=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/icons/Ticonrewards.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			GuVgF3Dyry7vP8BMW9VpbRWF+r6XHC2bpKCEc4mhQIQ=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/icons/Ticonscan.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			LJNd4aJ9YW/4msb43c2MeoDjlAvpfA35du3Kq7bllNg=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/images/icons/back_button.png</key>
@@ -257,11 +343,25 @@
 			tdWEhEjNeIkVAw/aAWAIfyX+5OhefGQfHvjxOTuiuWw=
 			</data>
 		</dict>
+		<key>flutter_assets/assets/images/icons/iconbike.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			vD36jDa2ksHrTQ8NER75lHo5ofSbSa6b35x8FtvPTTY=
+			</data>
+		</dict>
 		<key>flutter_assets/assets/images/icons/iconcard.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			1FkfwkLIVJeh9uZffg7RcmqSGiape5SNWt7bt3QjqDc=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/icons/iconcash.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			oyOC/XCo4Az4Xe6xfxougUNULTTDUbt9EBg83idBigc=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/images/icons/iconchat.png</key>
@@ -276,6 +376,13 @@
 			<key>hash2</key>
 			<data>
 			VT1ZkCW8ikDAt/Wk36VMC7LA/6/2xiuorGprq8yYYQ0=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/icons/iconhamburger.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			6eSWBfaWfind2rU7MhGJGQ/LQqKGB566XyWskq1H6jk=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/images/icons/iconlocation.png</key>
@@ -320,6 +427,13 @@
 			Q64gbpGU8BQ6bLfc+xJAyZzsZZsfORnlmN2mNZZHiLo=
 			</data>
 		</dict>
+		<key>flutter_assets/assets/images/icons/iconumrah.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			g5w5ey5yrIXE7u/hB5XqXMdplHLWFboejy4EDa01KlY=
+			</data>
+		</dict>
 		<key>flutter_assets/assets/images/icons/iconusername.png</key>
 		<dict>
 			<key>hash2</key>
@@ -362,6 +476,13 @@
 			0lf4VS0R77v2TOfBkwj5Ft3T0J477LSBcj4RxSfahY4=
 			</data>
 		</dict>
+		<key>flutter_assets/assets/images/logos/ziewnic-white-logo.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MpCHc6XcIW7ii3XM+QXMyNOPx7t9zW1H87e9lUmbqeI=
+			</data>
+		</dict>
 		<key>flutter_assets/assets/images/logos/ziewnic_horizontal_logo.png</key>
 		<dict>
 			<key>hash2</key>
@@ -394,7 +515,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			hzFAjRbgoTewBW+Va2+ObU6sX15E7WymskxfwqYad/U=
+			br/gI66/yruY0frbNxnaKRrWDbC5D6+CGpGUnDBccKs=
 			</data>
 		</dict>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

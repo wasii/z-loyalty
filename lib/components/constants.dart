@@ -22,6 +22,8 @@ const kLogoFolder = 'assets/images/logos/';
 const kIconFolder = 'assets/images/icons/';
 const kBGFolder = 'assets/images/bg/';
 
+const kTextHeadingColor = Color(0xFF363635);
+const kBoxBackgroundColor = Color(0xFFF0F0F0);
 const kSecondaryColor = Color.fromARGB(255, 0, 153, 255);
 const kTextColor = Color(0xFF12153D);
 const kTextLightColor = Color(0xFF9A9BB2);

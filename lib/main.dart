@@ -3,7 +3,7 @@ import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/authentication/login/login_page.dart';
 import 'package:loyalty_program/models/user_model.dart';
-import 'package:loyalty_program/pages/dashboard/dashboard.dart';
+import 'package:loyalty_program/pages/application/homescreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: false,
       ),
       home: (user != null && isRemembered)
-          ? const Dashboard()
+          ? const HomeScreen()
           : const LoginPage(),
     );
   }

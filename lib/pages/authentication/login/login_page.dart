@@ -6,16 +6,14 @@ import 'package:loyalty_program/components/app_text_field.dart';
 import 'package:loyalty_program/components/authentication_header.dart';
 import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
-import 'package:loyalty_program/components/custom_input_textfield_with_icon.dart';
-import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/user_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
+import 'package:loyalty_program/pages/application/homescreen.dart';
 import 'package:loyalty_program/pages/authentication/forget_password/forget_password_page.dart';
 import 'package:loyalty_program/pages/authentication/registration/registration_page.dart';
-import 'package:loyalty_program/pages/dashboard/dashboard.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -225,7 +223,7 @@ class _LoginPageState extends State<LoginPage> {
         await UserPrefsService.saveUser(user, rememberMe: rememberMe);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const Dashboard()),
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
         );
       } else {
         // Show error alert from response message

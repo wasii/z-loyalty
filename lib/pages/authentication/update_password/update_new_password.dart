@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/app_text_field.dart';
 import 'package:loyalty_program/components/authentication_header.dart';
 import 'package:loyalty_program/components/authentication_header_text.dart';
-import 'package:loyalty_program/components/constants.dart';
-import 'package:loyalty_program/components/custom_input_textfield.dart';
-import 'package:loyalty_program/components/custom_primary_button.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/pages/authentication/update_password_confirm/update_password_confirm.dart';
 
