@@ -24,8 +24,8 @@ class _CustomBottomTabBarState extends State<CustomBottomTabBar> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black26, // halka shadow
-            offset: Offset(0, -2), // upar se shadow niche ki taraf
+            color: Colors.black26,
+            offset: Offset(0, -2),
             blurRadius: 6,
           ),
         ],

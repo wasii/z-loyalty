@@ -3,6 +3,7 @@ import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_tabbar.dart';
 import 'package:loyalty_program/components/navigation_bar.dart';
 import 'package:loyalty_program/pages/application/dasboard/dashboard.dart';
+import 'package:loyalty_program/pages/application/installation/installation_home.dart';
 import 'package:loyalty_program/pages/application/sidemenu/side_menu.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,7 +17,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [const DashboardScreen()];
+  final List<Widget> _screens = [
+    const DashboardScreen(),
+    const InstallationHome(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             if (title == "Dashboard") {
               _currentIndex = 0;
+            } else if (title == "Installation") {
+              _currentIndex = 1;
             }
           });
         },
@@ -38,18 +44,27 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       body: _screens[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kPrimaryColor,
-        shape: const CircleBorder(),
-        onPressed: () {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("Scanner tapped")));
-        },
-        child: Image.asset(
-          "${kIconFolder}Ticonscan.png",
-          height: 50,
-          width: 50,
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: kPrimaryColor.withAlpha(200),
+              spreadRadius: 4,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          backgroundColor: kPrimaryColor,
+          shape: const CircleBorder(),
+          onPressed: () {},
+          child: Image.asset(
+            "${kIconFolder}Ticonscan.png",
+            height: 120,
+            width: 120,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
