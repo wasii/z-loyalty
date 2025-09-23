@@ -5,6 +5,7 @@ import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_heading.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/components/secondary_button.dart';
+import 'package:loyalty_program/pages/application/installation/installation_details.dart';
 
 class InstallationHome extends StatefulWidget {
   const InstallationHome({super.key});
@@ -138,7 +139,15 @@ class _InstallationHomeState extends State<InstallationHome> {
                                 Expanded(
                                   child: PrimaryButton(
                                     text: 'Next',
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const InstallationDetails(),
+                                        ),
+                                      );
+                                    },
                                     enabled: isVerified,
                                   ),
                                 ),

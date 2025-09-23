@@ -11,6 +11,7 @@ class AppTextField extends StatefulWidget {
   final TextInputType keyboardType; // 👈 naya field
   final FocusNode? focusNode;
   final bool editable;
+  final String prevalue;
 
   const AppTextField({
     Key? key,
@@ -22,6 +23,7 @@ class AppTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.focusNode,
     this.editable = true,
+    this.prevalue = '',
   }) : super(key: key);
 
   @override
@@ -39,6 +41,21 @@ class _AppTextFieldState extends State<AppTextField> {
     _focusNode.addListener(() {
       setState(() {}); // rebuild on focus change
     });
+
+    // 👇 yahan prevalue set karo
+    if (widget.prevalue.isNotEmpty) {
+      widget.controller.text = widget.prevalue;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AppTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // 👇 agar parent se nayi prevalue aayi ho to update kar do
+    if (widget.prevalue != oldWidget.prevalue && widget.prevalue.isNotEmpty) {
+      widget.controller.text = widget.prevalue;
+    }
   }
 
   @override
@@ -99,6 +116,10 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget build(BuildContext context) {
     bool isActive = _focusNode.hasFocus;
 
+    // 👇 agar prevalue hai to editable false aur text color black
+    final bool isPrevalueSet = widget.prevalue.isNotEmpty;
+    final bool isFieldEditable = isPrevalueSet ? false : widget.editable;
+
     return Container(
       height: 55,
       decoration: BoxDecoration(
@@ -123,7 +144,7 @@ class _AppTextFieldState extends State<AppTextField> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         obscureText: widget.isPassword ? _obscureText : false,
-        enabled: widget.editable,
+        enabled: isFieldEditable,
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: GoogleFonts.inter(
@@ -137,7 +158,11 @@ class _AppTextFieldState extends State<AppTextField> {
           suffixIcon: _buildSuffix(),
         ),
         style: GoogleFonts.inter(
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: isPrevalueSet ? Colors.black : Colors.black87, // 👈
+          ),
         ),
       ),
     );

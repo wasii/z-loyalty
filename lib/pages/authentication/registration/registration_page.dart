@@ -160,13 +160,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 120, // 👈 first field ka fixed width
+                                  width: 130, // 👈 first field ka fixed width
                                   child: AppTextField(
                                     controller: passwordController,
-                                    hintText: "92",
+                                    hintText: "",
                                     prefixImage: "iconpakistan.png",
                                     suffixImage: "icondropdown.png",
-                                    editable: false,
+                                    prevalue: '+92',
                                   ),
                                 ),
                                 const SizedBox(width: 5), // spacing
