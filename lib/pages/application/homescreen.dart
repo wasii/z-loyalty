@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_tabbar.dart';
 import 'package:loyalty_program/components/navigation_bar.dart';
+import 'package:loyalty_program/pages/application/claimpoints/claim_poinst.dart';
 import 'package:loyalty_program/pages/application/dasboard/dashboard.dart';
 import 'package:loyalty_program/pages/application/installation/installation_home.dart';
 import 'package:loyalty_program/pages/application/sidemenu/side_menu.dart';
@@ -20,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const InstallationHome(),
+    const ClaimPoints(),
   ];
 
   @override
@@ -34,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
               _currentIndex = 0;
             } else if (title == "Installation") {
               _currentIndex = 1;
+            } else if (title == "Claim Points") {
+              _currentIndex = 2;
             }
           });
         },

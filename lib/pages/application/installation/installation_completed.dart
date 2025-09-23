@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:loyalty_program/components/authentication_header.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/navigation_bar.dart';
 import 'package:loyalty_program/components/primary_button.dart';
