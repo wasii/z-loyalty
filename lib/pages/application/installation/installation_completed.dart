@@ -54,10 +54,17 @@ class InstallationSuccessfull extends StatelessWidget {
                       ),
                     ],
                   ),
-
+                  Text(
+                    'Keep going to unlock more rewards',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: kTextFieldPlaceholderColor,
+                    ),
+                  ),
                   Spacer(),
                   PrimaryButton(
-                    text: 'Back to Scan',
+                    text: 'Back to Claim Points',
                     onPressed: () {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                     },

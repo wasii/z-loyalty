@@ -7,6 +7,7 @@ import 'package:loyalty_program/components/secondary_button.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_earning_cell.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_earning_header.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_header.dart';
+import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_successful.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_points_reward.dart';
 
 class ClaimPoints extends StatefulWidget {
@@ -36,7 +37,12 @@ class _ClaimPointsState extends State<ClaimPoints> {
                     points: '300',
                     imagePath: '${kIconFolder}iconcash.png',
                     onClaim: () {
-                      showCustomPopup(context, 'Claim Cash', 'iconcash');
+                      showCustomPopup(
+                        context,
+                        'Claim Cash',
+                        'iconcash',
+                        'Cash',
+                      );
                     },
                     editable: true,
                   ),
@@ -46,7 +52,12 @@ class _ClaimPointsState extends State<ClaimPoints> {
                     points: '1000',
                     imagePath: '${kIconFolder}iconbike.png',
                     onClaim: () {
-                      showCustomPopup(context, 'Claim Bike', 'iconbike');
+                      showCustomPopup(
+                        context,
+                        'Claim Bike',
+                        'iconbike',
+                        'Bike',
+                      );
                     },
                     editable: true,
                   ),
@@ -60,9 +71,10 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         context,
                         'Claim Umrah Package',
                         'iconumrah',
+                        'Umrah',
                       );
                     },
-                    editable: true,
+                    editable: false,
                   ),
 
                   SizedBox(height: 20),
@@ -98,11 +110,16 @@ class _ClaimPointsState extends State<ClaimPoints> {
     );
   }
 
-  void showCustomPopup(BuildContext context, String title, String icon) {
+  void showCustomPopup(
+    BuildContext parentContext,
+    String title,
+    String icon,
+    String reward,
+  ) {
     final TextEditingController _controller = TextEditingController();
 
     showDialog(
-      context: context,
+      context: parentContext,
       builder: (context) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -157,13 +174,28 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         },
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: PrimaryButton(
                         text: 'Claim',
                         onPressed: () {
                           print("User typed: ${_controller.text}");
-                          Navigator.pop(context);
+                          Navigator.pop(context); // Pehle popup band karo
+
+                          // Ab 2 second baad dusri screen par jao
+                          Future.delayed(const Duration(seconds: 2), () {
+                            Navigator.push(
+                              parentContext,
+                              MaterialPageRoute(
+                                builder: (context) => ClaimPointSuccessful(
+                                  rewardName: reward,
+                                  icon: title == 'Claim Bike'
+                                      ? '${kBGFolder}bgBike.png'
+                                      : '$kIconFolder$icon.png',
+                                ), // yahan apni screen
+                              ),
+                            );
+                          });
                         },
                       ),
                     ),
