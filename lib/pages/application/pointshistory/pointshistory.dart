@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loyalty_program/components/navigation_bar.dart';
-import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_earning_cell.dart';
+import 'package:loyalty_program/pages/application/loyaltyreward/loyalty_reward_home.dart';
 import 'package:loyalty_program/pages/application/pointshistory/components/points_history_cell.dart';
 import 'package:loyalty_program/pages/application/pointshistory/components/points_history_header.dart';
 import 'package:loyalty_program/pages/application/pointshistory/components/points_history_header_cell.dart';
@@ -38,7 +38,17 @@ class _PointsHistoryViewState extends State<PointsHistoryView> {
                         children: [
                           PointsHistoryHeaderCell(),
                           SizedBox(height: 5),
-                          PointsHistoryCell(),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const LoyaltyRewardHome(),
+                                ),
+                              );
+                            },
+                            child: PointsHistoryCell(),
+                          ),
 
                           SizedBox(height: 5),
                           PointsHistoryCell(),
