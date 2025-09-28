@@ -27,57 +27,54 @@ class ClaimPointsEarningHistoryCell extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Text(
-                    title,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: kTextFieldHeadingNameColor,
-                    ),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                    maxLines: null,
-                  ),
-                ),
-                Text(
-                  seiralnumber,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  title,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: kTextFieldPlaceholderColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  points,
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: kPrimaryColor,
+                    color: kTextFieldHeadingNameColor,
                   ),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                  maxLines: null,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  date,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: kTextFieldPlaceholderColor,
-                  ),
+              ),
+              Text(
+                seiralnumber,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: kTextFieldPlaceholderColor,
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+          Spacer(),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                points,
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: kPrimaryColor,
+                ),
+              ),
+              if (date.isNotEmpty) const SizedBox(height: 4),
+              Text(
+                date,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: kTextFieldPlaceholderColor,
+                ),
+              ),
+            ],
           ),
         ],
       ),

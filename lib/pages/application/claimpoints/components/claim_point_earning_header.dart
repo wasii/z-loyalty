@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_heading.dart';
+import 'package:loyalty_program/pages/application/pointshistory/pointshistory.dart';
 
 class ClaimPointsEarningHeadingSection extends StatelessWidget {
   const ClaimPointsEarningHeadingSection({super.key});
@@ -13,7 +14,12 @@ class ClaimPointsEarningHeadingSection extends StatelessWidget {
         CustomHeading(heading: 'Earning History'),
         Spacer(),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PointsHistoryView()),
+            );
+          },
           child: Text(
             'View All',
             style: GoogleFonts.inter(
