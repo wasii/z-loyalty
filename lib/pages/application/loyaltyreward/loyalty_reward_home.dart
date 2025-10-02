@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/custom_heading.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/pages/application/loyaltyreward/components/loyalty_reward_history.dart';
 
 class LoyaltyRewardHome extends StatefulWidget {
   const LoyaltyRewardHome({super.key});
@@ -88,7 +89,7 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
 }
 
 class _LoyaltyRewardHeaderState extends StatefulWidget {
-  const _LoyaltyRewardHeaderState({super.key});
+  const _LoyaltyRewardHeaderState();
 
   @override
   State<_LoyaltyRewardHeaderState> createState() =>
@@ -226,7 +227,7 @@ class _PointsSpentCard extends StatelessWidget {
   }
 }
 
-class LoyaltyRewardCell extends StatelessWidget {
+class LoyaltyRewardCell extends StatefulWidget {
   const LoyaltyRewardCell({
     super.key,
     required this.title,
@@ -243,76 +244,91 @@ class LoyaltyRewardCell extends StatelessWidget {
   final String imagePath;
 
   @override
+  State<LoyaltyRewardCell> createState() => _LoyaltyRewardCellState();
+}
+
+class _LoyaltyRewardCellState extends State<LoyaltyRewardCell> {
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: kBoxBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          // Left Section - Image
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LoyaltyRewardHistory()),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kBoxBackgroundColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            // Left Section - Image
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Image.asset(widget.imagePath, width: 36, height: 33),
+              ),
             ),
-            child: Center(child: Image.asset(imagePath, width: 36, height: 33)),
-          ),
-          const SizedBox(width: 16),
-          // Middle Section - Title and Points
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(width: 16),
+            // Middle Section - Title and Points
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: kTextFieldHeadingNameColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${widget.points} Points',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Right Section - Date and Time
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  title,
+                  widget.date,
                   style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
                     color: kTextFieldHeadingNameColor,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$points Points',
+                  widget.time,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: kPrimaryColor,
+                    color: kTextFieldHeadingNameColor,
                   ),
                 ),
               ],
             ),
-          ),
-          // Right Section - Date and Time
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                date,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: kTextFieldHeadingNameColor,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                time,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: kTextFieldHeadingNameColor,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
