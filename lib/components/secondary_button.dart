@@ -6,12 +6,14 @@ class SecondaryButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool enabled;
+  final Color textColor;
 
   const SecondaryButton({
     super.key,
     required this.text,
     required this.onPressed,
     this.enabled = true,
+    this.textColor = kPrimaryColor,
   });
 
   @override
@@ -24,6 +26,7 @@ class SecondaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
             side: BorderSide(color: kPrimaryColor, width: 1),
@@ -33,7 +36,7 @@ class SecondaryButton extends StatelessWidget {
           text,
           style: GoogleFonts.inter(
             fontSize: 16,
-            color: kPrimaryColor,
+            color: textColor,
             fontWeight: FontWeight.w600,
           ),
         ),

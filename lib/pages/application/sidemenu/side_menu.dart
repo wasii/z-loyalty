@@ -57,7 +57,7 @@ class _CustomSidebarDrawerState extends State<CustomSidebarDrawer> {
               child: Column(
                 children: [
                   Image.asset(
-                    '$kLogoFolder/ziewnic_vertical_logo.png', // apna logo lagao
+                    '$kLogoFolder/ziewnic_vertical_logo.png',
                     height: 60,
                   ),
                   const SizedBox(height: 10),
@@ -86,6 +86,10 @@ class _CustomSidebarDrawerState extends State<CustomSidebarDrawer> {
             _buildMenuItem(
               "Points Inventory / History",
               isActive: widget.currentScreen == "Points Inventory / History",
+            ),
+            _buildMenuItem(
+              "Account",
+              isActive: widget.currentScreen == "Account",
             ),
 
             // Disabled Lucky Draw

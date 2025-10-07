@@ -44,11 +44,13 @@ class CustomNavigationBarWithBackButton extends StatelessWidget
     implements PreferredSizeWidget {
   final VoidCallback? onBackTap;
   final bool isVisible;
+  final bool showImage;
 
   const CustomNavigationBarWithBackButton({
     Key? key,
     this.onBackTap,
     this.isVisible = true,
+    this.showImage = true,
   }) : super(key: key);
 
   @override
@@ -71,17 +73,21 @@ class CustomNavigationBarWithBackButton extends StatelessWidget
           : null,
       title: Image.asset("${kLogoFolder}ziewnic_vertical_logo.png", height: 50),
       centerTitle: true,
-      actions: [
-        GestureDetector(
-          child: const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundImage: AssetImage("${kBGFolder}dummy_picture.png"),
-            ),
-          ),
-        ),
-      ],
+      actions: showImage
+          ? [
+              GestureDetector(
+                child: const Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundImage: AssetImage(
+                      "${kBGFolder}dummy_picture.png",
+                    ),
+                  ),
+                ),
+              ),
+            ]
+          : null,
     );
   }
 }

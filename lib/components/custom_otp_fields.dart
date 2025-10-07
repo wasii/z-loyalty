@@ -91,11 +91,6 @@ class _OTPInputWidgetState extends State<OTPInputWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(widget.length, (index) {
-        bool isActive =
-            _focusNodes[index].hasFocus ||
-            (_controllers[index].text.isNotEmpty &&
-                _controllers[index].text != "-");
-
         return Container(
           width: 60,
           height: 55,

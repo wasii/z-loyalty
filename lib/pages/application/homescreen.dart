@@ -6,6 +6,7 @@ import 'package:loyalty_program/pages/application/claimpoints/claim_poinst.dart'
 import 'package:loyalty_program/pages/application/dasboard/dashboard.dart';
 import 'package:loyalty_program/pages/application/installation/installation_home.dart';
 import 'package:loyalty_program/pages/application/loyaltyreward/loyalty_reward_home.dart';
+import 'package:loyalty_program/pages/application/userprofile/user_profile.dart';
 import 'package:loyalty_program/pages/application/sidemenu/side_menu.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const InstallationHome(),
     const ClaimPoints(),
     const LoyaltyRewardHome(),
+    const UserProfile(),
   ];
 
   @override
@@ -42,6 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
               _currentIndex = 2;
             } else if (title == "Loyalty Rewards") {
               _currentIndex = 3;
+            } else if (title == "Account") {
+              _currentIndex = 4;
             }
           });
         },
