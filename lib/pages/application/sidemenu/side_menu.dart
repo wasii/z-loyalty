@@ -87,10 +87,6 @@ class _CustomSidebarDrawerState extends State<CustomSidebarDrawer> {
               "Points Inventory / History",
               isActive: widget.currentScreen == "Points Inventory / History",
             ),
-            _buildMenuItem(
-              "Account",
-              isActive: widget.currentScreen == "Account",
-            ),
 
             // Disabled Lucky Draw
             Padding(

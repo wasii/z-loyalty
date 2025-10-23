@@ -6,8 +6,8 @@ import 'package:loyalty_program/pages/application/claimpoints/claim_poinst.dart'
 import 'package:loyalty_program/pages/application/dasboard/dashboard.dart';
 import 'package:loyalty_program/pages/application/installation/installation_home.dart';
 import 'package:loyalty_program/pages/application/loyaltyreward/loyalty_reward_home.dart';
-import 'package:loyalty_program/pages/application/userprofile/user_profile.dart';
 import 'package:loyalty_program/pages/application/sidemenu/side_menu.dart';
+import 'package:loyalty_program/pages/application/pointshistory/pointshistory.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,13 +19,21 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
-
+  int _tabCurrentIndex = 0;
   final List<Widget> _screens = [
     const DashboardScreen(),
     const InstallationHome(),
     const ClaimPoints(),
     const LoyaltyRewardHome(),
-    const UserProfile(),
+    const PointsHistoryView(),
+  ];
+
+  final List<String> _screenNames = [
+    "Dashboard",
+    "Installation",
+    "Claim Points",
+    "Loyalty Rewards",
+    "Points Inventory / History",
   ];
 
   @override
@@ -33,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: CustomSidebarDrawer(
-        currentScreen: "Dashboard",
+        currentScreen: _screenNames[_currentIndex],
         onMenuItemTap: (title) {
           setState(() {
             if (title == "Dashboard") {
@@ -44,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _currentIndex = 2;
             } else if (title == "Loyalty Rewards") {
               _currentIndex = 3;
-            } else if (title == "Account") {
+            } else if (title == "Points Inventory / History") {
               _currentIndex = 4;
             }
           });
@@ -81,11 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomBottomTabBar(
-        currentIndex: _currentIndex,
+        currentIndex: _tabCurrentIndex,
         onTabSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          // Bottom tab bar se navigation disabled - sirf sidebar se navigate karein
         },
       ),
     );
