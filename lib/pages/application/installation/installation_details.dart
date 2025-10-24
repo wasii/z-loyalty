@@ -8,7 +8,14 @@ import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/pages/application/installation/installation_completed.dart';
 
 class InstallationDetails extends StatefulWidget {
-  const InstallationDetails({super.key});
+  final String serialNumber;
+  final String? barcodeFormat;
+
+  const InstallationDetails({
+    super.key,
+    required this.serialNumber,
+    this.barcodeFormat,
+  });
 
   @override
   State<InstallationDetails> createState() => _InstallationDetailsState();
@@ -23,9 +30,16 @@ class _InstallationDetailsState extends State<InstallationDetails> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController remarksController = TextEditingController();
 
+  // Data from previous screen
+  late String serialNumber;
+  String? barcodeFormat;
+
   @override
   void initState() {
     super.initState();
+    // Initialize data from previous screen
+    serialNumber = widget.serialNumber;
+    barcodeFormat = widget.barcodeFormat;
   }
 
   @override

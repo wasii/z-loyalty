@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/app_text_field.dart';
@@ -6,6 +7,9 @@ import 'package:loyalty_program/components/custom_heading.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/components/secondary_button.dart';
 import 'package:loyalty_program/pages/application/installation/installation_details.dart';
+import 'package:loyalty_program/pages/application/installation/barcode_scanner_page.dart';
+import 'package:loyalty_program/network/api_service.dart';
+import 'package:loyalty_program/models/verify_serial_number_model.dart';
 
 class InstallationHome extends StatefulWidget {
   const InstallationHome({super.key});
@@ -18,6 +22,9 @@ class _InstallationHomeState extends State<InstallationHome> {
   final TextEditingController inputController = TextEditingController();
   bool isLoading = false;
   bool isVerified = false;
+  String? scannedBarcode;
+  Uint8List? scannedImage;
+  String? barcodeFormat;
 
   @override
   void initState() {
@@ -28,6 +35,26 @@ class _InstallationHomeState extends State<InstallationHome> {
     setState(() {
       isVerified = true;
     });
+  }
+
+  Future<void> _scanBarcode() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BarcodeScannerPage()),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        scannedBarcode = result['barcode'] as String?;
+        scannedImage = result['image'] as Uint8List?;
+        barcodeFormat = result['format'] as String?;
+
+        // Auto-fill the text field with scanned barcode
+        if (scannedBarcode != null) {
+          inputController.text = scannedBarcode!;
+        }
+      });
+    }
   }
 
   @override
@@ -61,21 +88,178 @@ class _InstallationHomeState extends State<InstallationHome> {
                         borderRadius: BorderRadius.circular(16),
                         color: kBoxBackgroundColor,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "${kIconFolder}iconimagepreview.png",
-                            height: 20,
-                            width: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            "Image Preview",
-                            style: GoogleFonts.inter(fontSize: 16),
-                          ),
-                        ],
-                      ),
+                      child: scannedBarcode != null
+                          ? scannedImage != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Stack(
+                                      children: [
+                                        Image.memory(
+                                          scannedImage!,
+                                          width: double.infinity,
+                                          height: 200,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return Center(
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.broken_image,
+                                                        size: 50,
+                                                        color: Colors.grey[400],
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Text(
+                                                        'Image Error',
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                              fontSize: 12,
+                                                              color: Colors
+                                                                  .grey[600],
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                        ),
+                                        // Remove button in top right corner
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withOpacity(
+                                                0.6,
+                                              ),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  scannedImage = null;
+                                                  scannedBarcode = null;
+                                                  barcodeFormat = null;
+                                                  inputController.clear();
+                                                });
+                                              },
+                                              padding: EdgeInsets.all(4),
+                                              constraints: BoxConstraints(),
+                                            ),
+                                          ),
+                                        ),
+                                        // Positioned(
+                                        //   bottom: 0,
+                                        //   left: 0,
+                                        //   right: 0,
+                                        //   child: Container(
+                                        //     padding: EdgeInsets.all(8),
+                                        //     decoration: BoxDecoration(
+                                        //       color: Colors.black.withOpacity(
+                                        //         0.7,
+                                        //       ),
+                                        //       borderRadius: BorderRadius.only(
+                                        //         bottomLeft: Radius.circular(16),
+                                        //         bottomRight: Radius.circular(
+                                        //           16,
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //     child: Column(
+                                        //       crossAxisAlignment:
+                                        //           CrossAxisAlignment.start,
+                                        //       mainAxisSize: MainAxisSize.min,
+                                        //       children: [
+                                        //         Text(
+                                        //           "Scanned: $scannedBarcode",
+                                        //           style: GoogleFonts.inter(
+                                        //             fontSize: 12,
+                                        //             color: Colors.white,
+                                        //             fontWeight: FontWeight.w600,
+                                        //           ),
+                                        //         ),
+                                        //         if (barcodeFormat != null)
+                                        //           Text(
+                                        //             "Format: $barcodeFormat",
+                                        //             style: GoogleFonts.inter(
+                                        //               fontSize: 10,
+                                        //               color: Colors.white70,
+                                        //             ),
+                                        //           ),
+                                        //       ],
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
+                                  )
+                                : Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.qr_code_2,
+                                          size: 60,
+                                          color: Colors.grey[400],
+                                        ),
+                                        SizedBox(height: 12),
+                                        Text(
+                                          "Barcode Entered",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          scannedBarcode!,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        if (barcodeFormat != null)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 4,
+                                            ),
+                                            child: Text(
+                                              barcodeFormat!,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: Colors.grey[500],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "${kIconFolder}iconimagepreview.png",
+                                  height: 20,
+                                  width: 20,
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  "Image Preview",
+                                  style: GoogleFonts.inter(fontSize: 16),
+                                ),
+                              ],
+                            ),
                     ),
                     SizedBox(height: 20),
                     Row(
@@ -83,16 +267,16 @@ class _InstallationHomeState extends State<InstallationHome> {
                         Expanded(
                           child: SecondaryButton(
                             text: 'Scan Now',
-                            onPressed: () {},
+                            onPressed: _scanBarcode,
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: PrimaryButton(
-                            text: 'Browse',
-                            onPressed: () {},
-                          ),
-                        ),
+                        // SizedBox(width: 10),
+                        // Expanded(
+                        //   child: PrimaryButton(
+                        //     text: 'Browse',
+                        //     onPressed: () {},
+                        //   ),
+                        // ),
                       ],
                     ),
                     SizedBox(height: 20),
@@ -143,8 +327,10 @@ class _InstallationHomeState extends State<InstallationHome> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) =>
-                                              const InstallationDetails(),
+                                          builder: (_) => InstallationDetails(
+                                            serialNumber: inputController.text,
+                                            barcodeFormat: barcodeFormat,
+                                          ),
                                         ),
                                       );
                                     },
@@ -165,5 +351,69 @@ class _InstallationHomeState extends State<InstallationHome> {
         ),
       ),
     );
+  }
+
+  void verifySerialNumber() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      final response = await api.request(
+        path: VerifySerialNumber,
+        type: RequestType.post,
+        data: {'serial_number': inputController.text},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final verify_serial = VerifySerialNumberModel.fromJson(json);
+      if (verify_serial.error == 0) {
+        var serial = inputController.text;
+        var format = barcodeFormat;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => InstallationDetails(
+              serialNumber: serial,
+              barcodeFormat: format,
+            ),
+          ),
+        );
+        inputController.text = '';
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Verify Serial Failed"),
+            content: Text(verify_serial.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Verify Serial Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

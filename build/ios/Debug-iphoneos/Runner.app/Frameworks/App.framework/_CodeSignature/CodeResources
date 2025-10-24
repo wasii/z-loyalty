@@ -22,7 +22,7 @@
 		</data>
 		<key>flutter_assets/NOTICES.Z</key>
 		<data>
-		ttlJYqj3IOhKC+Ye/GHLAP9KLYY=
+		ccY3bjFzgGaYG25/JsnnL7Y1Mu0=
 		</data>
 		<key>flutter_assets/NativeAssetsManifest.json</key>
 		<data>
@@ -67,10 +67,6 @@
 		<key>flutter_assets/assets/images/icons/Ticonscan.png</key>
 		<data>
 		Q5MPqn/v34HMi4M6S0H3G9Iu0Vc=
-		</data>
-		<key>flutter_assets/assets/images/icons/back_button.png</key>
-		<data>
-		bcP5VQcba/LWzhLFtTQvNnwPhGY=
 		</data>
 		<key>flutter_assets/assets/images/icons/checkmark_icon.png</key>
 		<data>
@@ -210,7 +206,7 @@
 		</data>
 		<key>flutter_assets/kernel_blob.bin</key>
 		<data>
-		eJ5IZz0XQ6AmIv9nbzqbcfjPfR4=
+		VPjcTXRQnaSTuQ095UD9EIlOXyg=
 		</data>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -252,7 +248,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ZGvBrqOPqNBwB5vknQvJPwscFnaJ8N8aOF/ASNk+h4c=
+			/b1u0f54CmJVDwkbZ1TsiZZXOddiaWZErfnJUupGATE=
 			</data>
 		</dict>
 		<key>flutter_assets/NativeAssetsManifest.json</key>
@@ -330,13 +326,6 @@
 			<key>hash2</key>
 			<data>
 			LJNd4aJ9YW/4msb43c2MeoDjlAvpfA35du3Kq7bllNg=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/icons/back_button.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			WQcR7/cvZXYArziQm6jWZYSSCE6EjNOXoAKHcg9vj+I=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/images/icons/checkmark_icon.png</key>
@@ -581,7 +570,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			g/K8Tv7qji7iU/qfgjdwHJ2p3X1XzMJAu+CdoG+6FWA=
+			bKSHttA2T8BwGsRG/hmPXRETds2PRI7AsQZmXqg3Ghk=
 			</data>
 		</dict>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

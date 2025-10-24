@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
+import 'package:loyalty_program/models/dashboard_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
+import 'package:loyalty_program/components/loader.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -10,6 +14,27 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  String _points = "0";
+  bool isLoading = false;
+  DashboardPointsModel? dashboardPointsModel;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      dashboardData();
+    });
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    if (dashboardPointsModel != null) {
+      _points = dashboardPointsModel!.myCurrentAvailablePoints;
+    }
+    super.setState(fn);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   SizedBox(height: 20),
 
                   //POINTS BALANCE
-                  PointsBalance(),
+                  PointsBalance(points: _points),
 
                   SizedBox(height: 20),
                   PrizeBox(
@@ -55,14 +80,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
+          if (isLoading) Loader(),
         ],
       ),
     );
   }
+
+  void dashboardData() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      var user = await UserPrefsService.getUser();
+      final response = await api.request(
+        path: DashboardGetPoints,
+        type: RequestType.post,
+        data: {'user_id': user?.id},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final dashboard = DashboardPointsModel.fromJson(json);
+
+      if (dashboard.error == 0) {
+        setState(() {
+          dashboardPointsModel = dashboard;
+        });
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Dashboard Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 }
 
-class WelcomeText extends StatelessWidget {
+class WelcomeText extends StatefulWidget {
   const WelcomeText({super.key});
+
+  @override
+  State<WelcomeText> createState() => _WelcomeTextState();
+}
+
+class _WelcomeTextState extends State<WelcomeText> {
+  String userName = "User";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final user = await UserPrefsService.getUser();
+    if (user != null && mounted) {
+      setState(() {
+        userName = user.name;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +166,7 @@ class WelcomeText extends StatelessWidget {
           ),
         ),
         Text(
-          "Afif Shaukat",
+          userName,
           style: GoogleFonts.inter(
             fontSize: 26,
             color: kTextHeadingColor,
@@ -90,7 +179,8 @@ class WelcomeText extends StatelessWidget {
 }
 
 class PointsBalance extends StatelessWidget {
-  const PointsBalance({super.key});
+  final String points;
+  const PointsBalance({super.key, required this.points});
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +210,7 @@ class PointsBalance extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "2450",
+                    points,
                     style: GoogleFonts.inter(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
