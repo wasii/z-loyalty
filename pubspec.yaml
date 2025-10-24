@@ -37,8 +37,8 @@ dependencies:
   google_fonts: ^6.2.1
   dio: ^5.4.0
   shared_preferences: ^2.2.2
-  image_picker:
-  permission_handler:
+  image_picker: ^1.0.7
+  permission_handler: ^11.3.0
   mobile_scanner: ^5.2.3
   qr_flutter: ^4.1.0
 

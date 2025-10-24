@@ -22,6 +22,7 @@ class _InstallationHomeState extends State<InstallationHome> {
   final TextEditingController inputController = TextEditingController();
   bool isLoading = false;
   bool isVerified = false;
+  bool isVerifyButtonEnabled = false;
   String? scannedBarcode;
   Uint8List? scannedImage;
   String? barcodeFormat;
@@ -29,11 +30,16 @@ class _InstallationHomeState extends State<InstallationHome> {
   @override
   void initState() {
     super.initState();
+    inputController.addListener(_onTextChanged);
   }
 
-  void _updateButtonState() {
+  void _onTextChanged() {
     setState(() {
-      isVerified = true;
+      isVerifyButtonEnabled = inputController.text.length == 8;
+      // Reset verification status when text changes
+      if (inputController.text.length != 8) {
+        isVerified = false;
+      }
     });
   }
 
@@ -59,6 +65,7 @@ class _InstallationHomeState extends State<InstallationHome> {
 
   @override
   void dispose() {
+    inputController.removeListener(_onTextChanged);
     inputController.dispose();
     super.dispose();
   }
@@ -157,48 +164,6 @@ class _InstallationHomeState extends State<InstallationHome> {
                                             ),
                                           ),
                                         ),
-                                        // Positioned(
-                                        //   bottom: 0,
-                                        //   left: 0,
-                                        //   right: 0,
-                                        //   child: Container(
-                                        //     padding: EdgeInsets.all(8),
-                                        //     decoration: BoxDecoration(
-                                        //       color: Colors.black.withOpacity(
-                                        //         0.7,
-                                        //       ),
-                                        //       borderRadius: BorderRadius.only(
-                                        //         bottomLeft: Radius.circular(16),
-                                        //         bottomRight: Radius.circular(
-                                        //           16,
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //     child: Column(
-                                        //       crossAxisAlignment:
-                                        //           CrossAxisAlignment.start,
-                                        //       mainAxisSize: MainAxisSize.min,
-                                        //       children: [
-                                        //         Text(
-                                        //           "Scanned: $scannedBarcode",
-                                        //           style: GoogleFonts.inter(
-                                        //             fontSize: 12,
-                                        //             color: Colors.white,
-                                        //             fontWeight: FontWeight.w600,
-                                        //           ),
-                                        //         ),
-                                        //         if (barcodeFormat != null)
-                                        //           Text(
-                                        //             "Format: $barcodeFormat",
-                                        //             style: GoogleFonts.inter(
-                                        //               fontSize: 10,
-                                        //               color: Colors.white70,
-                                        //             ),
-                                        //           ),
-                                        //       ],
-                                        //     ),
-                                        //   ),
-                                        // ),
                                       ],
                                     ),
                                   )
@@ -307,6 +272,7 @@ class _InstallationHomeState extends State<InstallationHome> {
                               controller: inputController,
                               hintText: 'Loyalty Code',
                               prefixImage: "iconcard.png",
+                              maxLength: 8,
                             ),
                             SizedBox(height: 25),
                             Row(
@@ -314,9 +280,8 @@ class _InstallationHomeState extends State<InstallationHome> {
                                 Expanded(
                                   child: PrimaryButton(
                                     text: 'Verify Now',
-                                    onPressed: () {
-                                      _updateButtonState();
-                                    },
+                                    onPressed: verifySerialNumber,
+                                    enabled: isVerifyButtonEnabled,
                                   ),
                                 ),
                                 SizedBox(width: 10),
@@ -347,6 +312,15 @@ class _InstallationHomeState extends State<InstallationHome> {
                 ),
               ),
             ),
+            if (isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -369,19 +343,19 @@ class _InstallationHomeState extends State<InstallationHome> {
       final json = response.data;
       final verify_serial = VerifySerialNumberModel.fromJson(json);
       if (verify_serial.error == 0) {
-        var serial = inputController.text;
-        var format = barcodeFormat;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => InstallationDetails(
-              serialNumber: serial,
-              barcodeFormat: format,
-            ),
+        setState(() {
+          isVerified = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Serial number verified successfully!'),
+            backgroundColor: Colors.green,
           ),
         );
-        inputController.text = '';
       } else {
+        setState(() {
+          isVerified = false;
+        });
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
@@ -399,6 +373,9 @@ class _InstallationHomeState extends State<InstallationHome> {
         );
       }
     } catch (e) {
+      setState(() {
+        isVerified = false;
+      });
       showDialog(
         context: context,
         builder: (_) => AlertDialog(

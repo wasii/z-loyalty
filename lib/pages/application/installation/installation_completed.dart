@@ -5,10 +5,17 @@ import 'package:loyalty_program/components/navigation_bar.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 
 class InstallationSuccessfull extends StatelessWidget {
-  const InstallationSuccessfull({super.key});
+  final String message;
+  const InstallationSuccessfull({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
+    final RegExp regex = RegExp(r'^(.*?earned )(\d+)(.*)$');
+    final match = regex.firstMatch(message);
+    final beforePoints = match?.group(1) ?? '';
+    final points = match?.group(2) ?? '';
+    final afterPoints = match?.group(3) ?? '';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomNavigationBarWithBackButton(isVisible: false),
@@ -22,7 +29,7 @@ class InstallationSuccessfull extends StatelessWidget {
                   SizedBox(height: 50),
                   Image.asset("${kIconFolder}iconsuccessful.png", height: 240),
                   Text(
-                    "You have earned ",
+                    beforePoints,
                     style: GoogleFonts.inter(
                       fontSize: 36,
                       fontWeight: FontWeight.w600,
@@ -35,7 +42,7 @@ class InstallationSuccessfull extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "30",
+                        points,
                         style: GoogleFonts.inter(
                           fontSize: 36,
                           fontWeight: FontWeight.w600,
@@ -44,7 +51,7 @@ class InstallationSuccessfull extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        " points!",
+                        afterPoints,
                         style: GoogleFonts.inter(
                           fontSize: 36,
                           fontWeight: FontWeight.w600,

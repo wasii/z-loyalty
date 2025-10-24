@@ -12,6 +12,7 @@ class AppTextField extends StatefulWidget {
   final FocusNode? focusNode;
   final bool editable;
   final String prevalue;
+  final int? maxLength;
 
   const AppTextField({
     Key? key,
@@ -24,6 +25,7 @@ class AppTextField extends StatefulWidget {
     this.focusNode,
     this.editable = true,
     this.prevalue = '',
+    this.maxLength,
   }) : super(key: key);
 
   @override
@@ -145,6 +147,7 @@ class _AppTextFieldState extends State<AppTextField> {
         keyboardType: widget.keyboardType,
         obscureText: widget.isPassword ? _obscureText : false,
         enabled: isFieldEditable,
+        maxLength: widget.maxLength,
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: GoogleFonts.inter(
@@ -156,6 +159,7 @@ class _AppTextFieldState extends State<AppTextField> {
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
           prefixIcon: _buildPrefix(),
           suffixIcon: _buildSuffix(),
+          counterText: '', // Hide the counter text below the field
         ),
         style: GoogleFonts.inter(
           textStyle: TextStyle(
