@@ -57,7 +57,7 @@ class _CustomSidebarDrawerState extends State<CustomSidebarDrawer> {
               child: Column(
                 children: [
                   Image.asset(
-                    '$kLogoFolder/ziewnic_vertical_logo.png',
+                    '${kLogoFolder}ziewnic_vertical_logo.png',
                     height: 60,
                   ),
                   const SizedBox(height: 10),

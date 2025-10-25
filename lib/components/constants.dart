@@ -31,6 +31,7 @@ const kFillStarColor = Color(0xFFFCC419);
 const kErrorBackColor = Color(0xFFC72C41);
 
 const kDefaultPadding = 20.0;
+var kUserPoints = "0";
 
 const kDefaultShadow = BoxShadow(
   offset: Offset(0, 0),

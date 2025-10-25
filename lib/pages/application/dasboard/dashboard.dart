@@ -106,6 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (dashboard.error == 0) {
         setState(() {
           dashboardPointsModel = dashboard;
+          kUserPoints = dashboard.myCurrentAvailablePoints;
         });
       }
     } catch (e) {

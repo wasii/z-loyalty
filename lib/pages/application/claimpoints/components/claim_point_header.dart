@@ -25,7 +25,7 @@ class ClaimPointsHeaderSection extends StatelessWidget {
               Image.asset('${kIconFolder}iconZcoin.png', width: 20, height: 20),
               SizedBox(width: 5),
               Text(
-                '1550',
+                kUserPoints,
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

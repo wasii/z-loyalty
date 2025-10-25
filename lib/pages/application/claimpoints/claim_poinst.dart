@@ -4,6 +4,10 @@ import 'package:loyalty_program/components/app_text_field.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/components/secondary_button.dart';
+import 'package:loyalty_program/models/claim_points_model.dart';
+import 'package:loyalty_program/models/claim_reward_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_earning_cell.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_earning_header.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_header.dart';
@@ -18,6 +22,20 @@ class ClaimPoints extends StatefulWidget {
 }
 
 class _ClaimPointsState extends State<ClaimPoints> {
+  bool isLoading = false;
+  List<InstallationClaim> claims = [];
+  bool showCash = false;
+  bool showBike = false;
+  bool showUmrah = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getClaimPoints();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +62,7 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         'Cash',
                       );
                     },
-                    editable: true,
+                    editable: showCash,
                   ),
                   SizedBox(height: 10),
                   ClaimPointRewardSection(
@@ -59,7 +77,7 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         'Bike',
                       );
                     },
-                    editable: true,
+                    editable: showBike,
                   ),
                   SizedBox(height: 10),
                   ClaimPointRewardSection(
@@ -74,33 +92,25 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         'Umrah',
                       );
                     },
-                    editable: false,
+                    editable: showUmrah,
                   ),
 
                   SizedBox(height: 20),
                   ClaimPointsEarningHeadingSection(),
                   SizedBox(height: 10),
-                  ClaimPointsEarningHistoryCell(
-                    title: 'Solar Hybrid Inverter 1.6 (KVA)',
-                    seiralnumber: '72901063',
-                    points: '+30',
-                    date: 'Sep 23, 2025',
-                  ),
-                  SizedBox(height: 10),
-                  ClaimPointsEarningHistoryCell(
-                    title: 'Solar Hybrid Inverter 1.6 (KVA)',
-                    seiralnumber: 'FGH85FF',
-                    points: '+30',
-                    date: 'Sep 21, 2025',
-                  ),
-                  SizedBox(height: 10),
-                  ClaimPointsEarningHistoryCell(
-                    title: 'Solar Hybrid Inverter 1.6 (KVA)',
-                    seiralnumber: '98PPOQQ',
-                    points: '+30',
-                    date: 'Sep 19, 2025',
-                  ),
-                  SizedBox(height: 10),
+                  ...claims.take(4).map((claim) {
+                    return Column(
+                      children: [
+                        ClaimPointsEarningHistoryCell(
+                          title: claim.itemInstalled,
+                          seiralnumber: claim.serialNumber,
+                          points: '+${claim.pointsEarned}',
+                          date: 'N/A', // Date field not available in API
+                        ),
+                        SizedBox(height: 10),
+                      ],
+                    );
+                  }).toList(),
                 ],
               ),
             ),
@@ -180,22 +190,14 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         text: 'Claim',
                         onPressed: () {
                           print("User typed: ${_controller.text}");
-                          Navigator.pop(context); // Pehle popup band karo
-
-                          // Ab 2 second baad dusri screen par jao
-                          Future.delayed(const Duration(seconds: 2), () {
-                            Navigator.push(
-                              parentContext,
-                              MaterialPageRoute(
-                                builder: (context) => ClaimPointSuccessful(
-                                  rewardName: reward,
-                                  icon: title == 'Claim Bike'
-                                      ? '${kBGFolder}bgBike.png'
-                                      : '$kIconFolder$icon.png',
-                                ), // yahan apni screen
-                              ),
-                            );
-                          });
+                          Navigator.pop(context);
+                          if (title == 'Claim Cash') {
+                            claimCash(_controller.text);
+                          } else if (title == 'Claim Bike') {
+                            claimBike(_controller.text);
+                          } else if (title == 'Claim Umrah') {
+                            claimUmrah(_controller.text);
+                          }
                         },
                       ),
                     ),
@@ -207,5 +209,215 @@ class _ClaimPointsState extends State<ClaimPoints> {
         );
       },
     );
+  }
+
+  void getClaimPoints() async {
+    setState(() => isLoading = true);
+
+    try {
+      var user = await UserPrefsService.getUser();
+      final api = ApiService();
+      final response = await api.request(
+        path: GetClaimPoints,
+        type: RequestType.post,
+        data: {'user_id': 68}, //user?.id ?? 0},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimPoints = InstallationClaimsResponse.fromJson(json);
+      if (claimPoints.error == 0) {
+        setState(() {
+          claims = claimPoints.installationClaims;
+          showCash = claimPoints.showCash;
+          showBike = claimPoints.showBike;
+          showUmrah = claimPoints.showUmrah;
+        });
+      } else {}
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Claim Points Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void claimCash(String remarks) async {
+    setState(() => isLoading = true);
+    try {
+      var user = await UserPrefsService.getUser();
+      final api = ApiService();
+      final response = await api.request(
+        path: GetClaimPoints,
+        type: RequestType.post,
+        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimReward = ClaimRewardModel.fromJson(json);
+      if (claimReward.error == 0) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ClaimPointSuccessful(rewardName: 'Cash', icon: 'iconcash'),
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Claim Cash Failed"),
+            content: Text(claimReward.message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Claim Cash Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void claimBike(String remarks) async {
+    setState(() => isLoading = true);
+    try {
+      var user = await UserPrefsService.getUser();
+      final api = ApiService();
+      final response = await api.request(
+        path: GetClaimPoints,
+        type: RequestType.post,
+        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimReward = ClaimRewardModel.fromJson(json);
+      if (claimReward.error == 0) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ClaimPointSuccessful(rewardName: 'Bike', icon: 'iconbike'),
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Claim Bike Failed"),
+            content: Text(claimReward.message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Claim Bike Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void claimUmrah(String remarks) async {
+    setState(() => isLoading = true);
+    try {
+      var user = await UserPrefsService.getUser();
+      final api = ApiService();
+      final response = await api.request(
+        path: GetClaimPoints,
+        type: RequestType.post,
+        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimReward = ClaimRewardModel.fromJson(json);
+      if (claimReward.error == 0) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ClaimPointSuccessful(rewardName: 'Umrah', icon: 'iconumrah'),
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Claim Umrah Failed"),
+            content: Text(claimReward.message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Claim Umrah Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }
