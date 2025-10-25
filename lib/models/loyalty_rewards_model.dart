@@ -1,3 +1,6 @@
+import 'package:intl/intl.dart';
+import 'package:loyalty_program/components/constants.dart';
+
 class LoyaltyRewardsResponse {
   final int error;
   final List<LoyaltyReward> loyaltyRewards;
@@ -53,6 +56,56 @@ class LoyaltyReward {
     this.rejectedOn,
     this.rejectedRemarks,
   });
+
+  // Computed properties based on points
+  String get rewardName {
+    if (points == 300) {
+      return 'Cash Prize';
+    } else if (points == 1500) {
+      return 'Bike Prize';
+    } else if (points == 3000) {
+      return 'Umrah Prize';
+    } else {
+      return 'Reward';
+    }
+  }
+
+  String get rewardImage {
+    if (points >= 300 && points <= 1499) {
+      return '${kIconFolder}iconcash.png';
+    } else if (points >= 1500 && points <= 2999) {
+      return '${kIconFolder}iconbike.png';
+    } else if (points >= 3000) {
+      return '${kIconFolder}iconumrah.png';
+    } else {
+      return 'assets/images/icons/reward.png';
+    }
+  }
+
+  // Computed properties for date and time from rewardedOn
+  String get customDate {
+    if (rewardedOn == null || rewardedOn!.isEmpty) {
+      return '';
+    }
+    try {
+      DateTime dateTime = DateTime.parse(rewardedOn!);
+      return DateFormat('MMM dd, yyyy').format(dateTime);
+    } catch (e) {
+      return rewardedOn ?? '';
+    }
+  }
+
+  String get customTime {
+    if (rewardedOn == null || rewardedOn!.isEmpty) {
+      return '';
+    }
+    try {
+      DateTime dateTime = DateTime.parse(rewardedOn!);
+      return DateFormat('hh:mm a').format(dateTime);
+    } catch (e) {
+      return '';
+    }
+  }
 
   factory LoyaltyReward.fromJson(Map<String, dynamic> json) {
     return LoyaltyReward(

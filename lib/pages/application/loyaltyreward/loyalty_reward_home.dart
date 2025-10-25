@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/custom_heading.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/pages/application/loyaltyreward/components/loyalty_reward_history.dart';
+import 'package:loyalty_program/network/api_service.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
+import 'package:loyalty_program/models/loyalty_rewards_model.dart';
 
 class LoyaltyRewardHome extends StatefulWidget {
   const LoyaltyRewardHome({super.key});
@@ -12,6 +15,16 @@ class LoyaltyRewardHome extends StatefulWidget {
 }
 
 class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
+  bool isLoading = false;
+  List<LoyaltyReward> rewards = [];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getLoyaltyRewardList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,58 +39,22 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
                 children: [
                   LoyaltyRewardHeader(
                     heading: 'Loyalty Rewards',
-                    dateRange: 'Aug 10 - Sep 10, 2025',
-                    pointsSpent: 1550,
+                    dateRange: 'Date: N/A', //Aug 10 - Sep 10, 2025',
+                    pointsSpent: kUserPoints,
                   ),
                   const SizedBox(height: 20),
-                  LoyaltyRewardCell(
-                    title: 'Bike Prize',
-                    points: 1500,
-                    date: 'Aug 14, 2025',
-                    time: '06:54:22',
-                    imagePath: '${kIconFolder}iconbike.png',
+                  ...rewards.expand(
+                    (reward) => [
+                      LoyaltyRewardCell(
+                        title: reward.rewardName,
+                        points: reward.points,
+                        date: reward.customDate,
+                        time: reward.customTime,
+                        imagePath: reward.rewardImage,
+                      ),
+                      const SizedBox(height: 5),
+                    ],
                   ),
-                  const SizedBox(height: 5),
-                  LoyaltyRewardCell(
-                    title: 'Bike Prize',
-                    points: 1500,
-                    date: 'Aug 14, 2025',
-                    time: '06:54:22',
-                    imagePath: '${kIconFolder}iconbike.png',
-                  ),
-                  const SizedBox(height: 5),
-                  LoyaltyRewardCell(
-                    title: 'Bike Prize',
-                    points: 1500,
-                    date: 'Aug 14, 2025',
-                    time: '06:54:22',
-                    imagePath: '${kIconFolder}iconbike.png',
-                  ),
-                  const SizedBox(height: 5),
-                  LoyaltyRewardCell(
-                    title: 'Bike Prize',
-                    points: 1500,
-                    date: 'Aug 14, 2025',
-                    time: '06:54:22',
-                    imagePath: '${kIconFolder}iconbike.png',
-                  ),
-                  const SizedBox(height: 5),
-                  LoyaltyRewardCell(
-                    title: 'Bike Prize',
-                    points: 1500,
-                    date: 'Aug 14, 2025',
-                    time: '06:54:22',
-                    imagePath: '${kIconFolder}iconbike.png',
-                  ),
-                  const SizedBox(height: 5),
-                  LoyaltyRewardCell(
-                    title: 'Bike Prize',
-                    points: 1500,
-                    date: 'Aug 14, 2025',
-                    time: '06:54:22',
-                    imagePath: '${kIconFolder}iconbike.png',
-                  ),
-                  const SizedBox(height: 5),
                 ],
               ),
             ),
@@ -85,6 +62,45 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
         ],
       ),
     );
+  }
+
+  void getLoyaltyRewardList() async {
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+      var user = await UserPrefsService.getUser();
+      final response = await api.request(
+        path: GetLoyaltyRewards,
+        type: RequestType.post,
+        data: {'user_id': 65}, //user?.id ?? 0},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final claimPoints = LoyaltyRewardsResponse.fromJson(json);
+      if (claimPoints.error == 0) {
+        setState(() {
+          rewards = claimPoints.loyaltyRewards;
+        });
+      } else {}
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Loyalty Rewards Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }
 
@@ -118,7 +134,7 @@ class LoyaltyRewardHeader extends StatelessWidget {
 
   final String heading;
   final String dateRange;
-  final int pointsSpent;
+  final String pointsSpent;
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +199,7 @@ class _DateRangePill extends StatelessWidget {
 class _PointsSpentCard extends StatelessWidget {
   const _PointsSpentCard({required this.points});
 
-  final int points;
+  final String points;
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +228,7 @@ class _PointsSpentCard extends StatelessWidget {
               Image.asset(kIconFolder + 'iconZcoin.png', height: 28, width: 28),
               const SizedBox(width: 8),
               Text(
-                points.toString(),
+                points,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
