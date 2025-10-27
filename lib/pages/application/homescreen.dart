@@ -8,6 +8,7 @@ import 'package:loyalty_program/pages/application/installation/installation_home
 import 'package:loyalty_program/pages/application/loyaltyreward/loyalty_reward_home.dart';
 import 'package:loyalty_program/pages/application/sidemenu/side_menu.dart';
 import 'package:loyalty_program/pages/application/pointshistory/pointshistory.dart';
+import 'package:loyalty_program/pages/application/userprofile/user_profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const ClaimPoints(),
     const LoyaltyRewardHome(),
     const PointsHistoryView(),
+    const UserProfile(),
   ];
 
   final List<String> _screenNames = [
@@ -34,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     "Claim Points",
     "Loyalty Rewards",
     "Points Inventory / History",
+    "User Profile",
   ];
 
   @override
@@ -54,6 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
               _currentIndex = 3;
             } else if (title == "Points Inventory / History") {
               _currentIndex = 4;
+            } else if (title == "User Profile") {
+              _currentIndex = 5;
             }
           });
         },
@@ -79,7 +84,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: FloatingActionButton(
           backgroundColor: kPrimaryColor,
           shape: const CircleBorder(),
-          onPressed: () {},
+          onPressed: () {
+            setState(() {
+              _currentIndex = 1; // Installation Home
+            });
+          },
           child: Image.asset(
             "${kIconFolder}Ticonscan.png",
             height: 120,
@@ -91,8 +100,44 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: CustomBottomTabBar(
         currentIndex: _tabCurrentIndex,
         onTabSelected: (index) {
-          // Bottom tab bar se navigation disabled - sirf sidebar se navigate karein
+          print(index);
+          if (index == 0) {
+            setState(() {
+              _tabCurrentIndex = index;
+              _currentIndex = 0; // Dashboard
+            });
+          } else if (index == 1) {
+            setState(() {
+              _tabCurrentIndex = index;
+              _currentIndex = 3; // Loyalty Rewards (LoyaltyRewardHome)
+            });
+          } else if (index == 2) {
+            // Show "Coming Soon" popup for other tabs
+            _showComingSoonDialog();
+            // Don't update _tabCurrentIndex to keep previous tab selected
+          } else if (index == 3) {
+            setState(() {
+              _tabCurrentIndex = index;
+              _currentIndex = 5; // User Profile
+            });
+          }
         },
+      ),
+    );
+  }
+
+  void _showComingSoonDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Coming Soon"),
+        content: const Text("This feature is coming soon!"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
       ),
     );
   }
