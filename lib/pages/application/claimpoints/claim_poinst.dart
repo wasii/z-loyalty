@@ -96,21 +96,36 @@ class _ClaimPointsState extends State<ClaimPoints> {
                   ),
 
                   SizedBox(height: 20),
-                  ClaimPointsEarningHeadingSection(),
+                  ClaimPointsEarningHeadingSection(claims: claims),
                   SizedBox(height: 10),
-                  ...claims.take(4).map((claim) {
-                    return Column(
-                      children: [
-                        ClaimPointsEarningHistoryCell(
-                          title: claim.itemInstalled,
-                          seiralnumber: claim.serialNumber,
-                          points: '+${claim.pointsEarned}',
-                          date: 'N/A', // Date field not available in API
+                  if (claims.isEmpty)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: Center(
+                        child: Text(
+                          'No Data Found',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: kTextFieldPlaceholderColor,
+                          ),
                         ),
-                        SizedBox(height: 10),
-                      ],
-                    );
-                  }).toList(),
+                      ),
+                    )
+                  else
+                    ...claims.take(4).map((claim) {
+                      return Column(
+                        children: [
+                          ClaimPointsEarningHistoryCell(
+                            title: claim.itemInstalled,
+                            seiralnumber: claim.serialNumber,
+                            points: '+${claim.pointsEarned}',
+                            date: 'N/A', // Date field not available in API
+                          ),
+                          SizedBox(height: 10),
+                        ],
+                      );
+                    }).toList(),
                 ],
               ),
             ),
@@ -220,7 +235,7 @@ class _ClaimPointsState extends State<ClaimPoints> {
       final response = await api.request(
         path: GetClaimPoints,
         type: RequestType.post,
-        data: {'user_id': 68}, //user?.id ?? 0},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 
@@ -271,8 +286,10 @@ class _ClaimPointsState extends State<ClaimPoints> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ClaimPointSuccessful(rewardName: 'Cash', icon: 'iconcash'),
+            builder: (context) => ClaimPointSuccessful(
+              rewardName: 'Cash',
+              icon: '${kIconFolder}iconcash.png',
+            ),
           ),
         );
       } else {
@@ -327,8 +344,10 @@ class _ClaimPointsState extends State<ClaimPoints> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ClaimPointSuccessful(rewardName: 'Bike', icon: 'iconbike'),
+            builder: (context) => ClaimPointSuccessful(
+              rewardName: 'Bike',
+              icon: '${kIconFolder}iconbike.png',
+            ),
           ),
         );
       } else {
@@ -383,8 +402,10 @@ class _ClaimPointsState extends State<ClaimPoints> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ClaimPointSuccessful(rewardName: 'Umrah', icon: 'iconumrah'),
+            builder: (context) => ClaimPointSuccessful(
+              rewardName: 'Umrah',
+              icon: '${kIconFolder}iconumrah.png',
+            ),
           ),
         );
       } else {

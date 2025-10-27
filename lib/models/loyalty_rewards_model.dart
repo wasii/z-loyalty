@@ -59,11 +59,11 @@ class LoyaltyReward {
 
   // Computed properties based on points
   String get rewardName {
-    if (points == 300) {
+    if (points >= 300 && points <= 1499) {
       return 'Cash Prize';
-    } else if (points == 1500) {
+    } else if (points >= 1500 && points <= 2999) {
       return 'Bike Prize';
-    } else if (points == 3000) {
+    } else if (points >= 3000) {
       return 'Umrah Prize';
     } else {
       return 'Reward';

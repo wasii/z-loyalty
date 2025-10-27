@@ -24,7 +24,7 @@ class PointsHistoryHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Aug 10 - Sep 10, 2025',
+                  'Date: N/A',
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,

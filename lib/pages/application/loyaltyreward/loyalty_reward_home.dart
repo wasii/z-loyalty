@@ -17,6 +17,7 @@ class LoyaltyRewardHome extends StatefulWidget {
 class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
   bool isLoading = false;
   List<LoyaltyReward> rewards = [];
+  int pointsSpent = 0;
   @override
   void initState() {
     super.initState();
@@ -40,7 +41,7 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
                   LoyaltyRewardHeader(
                     heading: 'Loyalty Rewards',
                     dateRange: 'Date: N/A', //Aug 10 - Sep 10, 2025',
-                    pointsSpent: kUserPoints,
+                    pointsSpent: pointsSpent.toString(),
                   ),
                   const SizedBox(height: 20),
                   ...rewards.expand(
@@ -82,6 +83,8 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
       if (claimPoints.error == 0) {
         setState(() {
           rewards = claimPoints.loyaltyRewards;
+          // Calculate total points from all rewards
+          pointsSpent = rewards.fold(0, (sum, reward) => sum + reward.points);
         });
       } else {}
     } catch (e) {
@@ -268,10 +271,10 @@ class _LoyaltyRewardCellState extends State<LoyaltyRewardCell> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const LoyaltyRewardHistory()),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (_) => const LoyaltyRewardHistory()),
+        // );
       },
       child: Container(
         width: double.infinity,

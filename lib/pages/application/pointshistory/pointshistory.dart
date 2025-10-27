@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:loyalty_program/components/navigation_bar.dart';
-import 'package:loyalty_program/pages/application/loyaltyreward/loyalty_reward_home.dart';
+import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/models/points_inventory_history_model.dart';
+import 'package:loyalty_program/network/api_service.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/application/pointshistory/components/points_history_cell.dart';
 import 'package:loyalty_program/pages/application/pointshistory/components/points_history_header.dart';
-import 'package:loyalty_program/pages/application/pointshistory/components/points_history_header_cell.dart';
 
 class PointsHistoryView extends StatefulWidget {
   const PointsHistoryView({super.key});
@@ -13,14 +14,18 @@ class PointsHistoryView extends StatefulWidget {
 }
 
 class _PointsHistoryViewState extends State<PointsHistoryView> {
+  bool isLoading = false;
+  List<PointsInventoryHistoryData> points = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getPointsInventoryHistory();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomNavigationBarWithBackButton(
-        onBackTap: () {
-          Navigator.pop(context);
-        },
-      ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -36,38 +41,24 @@ class _PointsHistoryViewState extends State<PointsHistoryView> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          PointsHistoryHeaderCell(),
-                          SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const LoyaltyRewardHome(),
+                          ...points.map((point) {
+                            // Check if points already has a sign
+                            String pointsStr = point.points.toString();
+                            if (!pointsStr.startsWith('-')) {
+                              pointsStr = '+$pointsStr';
+                            }
+
+                            return Column(
+                              children: [
+                                PointsHistoryCell(
+                                  detail: point.details,
+                                  inventorytype: point.inventoryType,
+                                  points: pointsStr,
                                 ),
-                              );
-                            },
-                            child: PointsHistoryCell(),
-                          ),
-
-                          SizedBox(height: 5),
-                          PointsHistoryCell(),
-                          SizedBox(height: 5),
-                          PointsHistoryCell(),
-                          SizedBox(height: 5),
-                          PointsHistoryCell(),
-
-                          SizedBox(height: 20),
-
-                          PointsHistoryHeaderCell(),
-                          SizedBox(height: 5),
-                          PointsHistoryCell(),
-
-                          SizedBox(height: 5),
-
-                          PointsHistoryCell(),
-                          SizedBox(height: 5),
-                          PointsHistoryCell(),
+                                SizedBox(height: 5),
+                              ],
+                            );
+                          }).toList(),
                         ],
                       ),
                     ),
@@ -79,5 +70,44 @@ class _PointsHistoryViewState extends State<PointsHistoryView> {
         ],
       ),
     );
+  }
+
+  void getPointsInventoryHistory() async {
+    setState(() => isLoading = true);
+
+    try {
+      var user = await UserPrefsService.getUser();
+      final api = ApiService();
+      final response = await api.request(
+        path: GetPointsInventoryHistory,
+        type: RequestType.post,
+        data: {'user_id': 65}, //user?.id ?? 0},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final historyPoints = PointsInventoryHistoryResponse.fromJson(json);
+      if (historyPoints.error == 0) {
+        setState(() {
+          points = historyPoints.pointsInventoryHistory;
+        });
+      } else {}
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Points Inventory Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

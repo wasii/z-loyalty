@@ -3,7 +3,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 
 class PointsHistoryCell extends StatelessWidget {
-  const PointsHistoryCell({super.key});
+  final String detail;
+  final String inventorytype;
+  final String points;
+
+  const PointsHistoryCell({
+    super.key,
+    required this.detail,
+    required this.inventorytype,
+    required this.points,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +33,7 @@ class PointsHistoryCell extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Solar Hybrid Inverter 1.6 (KVA)',
+                  inventorytype,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -32,7 +41,7 @@ class PointsHistoryCell extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'FGH85FF',
+                  detail,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: kTextFieldPlaceholderColor,
@@ -42,7 +51,7 @@ class PointsHistoryCell extends StatelessWidget {
             ),
             Spacer(),
             Text(
-              '+30',
+              points,
               style: GoogleFonts.inter(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
