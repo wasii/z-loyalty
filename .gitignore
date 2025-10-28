@@ -2,3 +2,4 @@ build/ios/Release-iphoneos/Flutter.framework.dSYM/Contents/Resources/DWARF/Flutt
 build/app/intermediates/incremental/debug-mergeJavaRes/zip-cache/oNG2f+RkGdnjqrlzAtJwnx9OLk0=
 build/app/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/arm64-v8a/libVkLayer_khronos_validation.so
 build/app/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/arm64-v8a/libflutter.so
+build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/arm64-v8a/libflutter.so
