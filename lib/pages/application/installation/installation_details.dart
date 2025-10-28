@@ -36,6 +36,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController productController = TextEditingController();
+  final TextEditingController installationController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController remarksController = TextEditingController();
@@ -225,7 +226,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "72901063",
+                            widget.serialNumber,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -234,7 +235,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                           ),
                           SizedBox(height: 5),
                           Text(
-                            'SOLAR HYBRID INVERTER 1.6 (KVA)',
+                            'N/A',
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -310,7 +311,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                       children: [
                         Expanded(
                           child: AppTextField(
-                            controller: productController,
+                            controller: installationController,
                             hintText: 'Installation Proof',
                             prefixImage: 'iconinstallation.png',
                             editable: false,

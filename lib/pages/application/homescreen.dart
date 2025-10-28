@@ -9,6 +9,8 @@ import 'package:loyalty_program/pages/application/loyaltyreward/loyalty_reward_h
 import 'package:loyalty_program/pages/application/sidemenu/side_menu.dart';
 import 'package:loyalty_program/pages/application/pointshistory/pointshistory.dart';
 import 'package:loyalty_program/pages/application/userprofile/user_profile.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
+import 'package:loyalty_program/pages/authentication/login/login_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +47,16 @@ class _HomeScreenState extends State<HomeScreen> {
       key: _scaffoldKey,
       drawer: CustomSidebarDrawer(
         currentScreen: _screenNames[_currentIndex],
-        onMenuItemTap: (title) {
+        onMenuItemTap: (title) async {
+          if (title == "Logout") {
+            await UserPrefsService.clearUser();
+            if (!mounted) return;
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const LoginPage()),
+              (route) => false,
+            );
+            return;
+          }
           setState(() {
             if (title == "Dashboard") {
               _currentIndex = 0;

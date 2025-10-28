@@ -18,6 +18,7 @@ class InstallationHome extends StatefulWidget {
   State<InstallationHome> createState() => _InstallationHomeState();
 }
 
+// D65D9J7A
 class _InstallationHomeState extends State<InstallationHome> {
   final TextEditingController inputController = TextEditingController();
   bool isLoading = false;
@@ -349,7 +350,8 @@ class _InstallationHomeState extends State<InstallationHome> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Serial number verified successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: kPrimaryColor,
+            duration: Duration(seconds: 2),
           ),
         );
       } else {

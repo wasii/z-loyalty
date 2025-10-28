@@ -27,6 +27,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController countryCodeController = TextEditingController();
   final TextEditingController whatsappNumberController =
       TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -91,10 +92,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phoneNumberController.dispose();
+    countryCodeController.dispose();
     whatsappNumberController.dispose();
     emailController.dispose();
     cityController.dispose();
     experienceInYearsController.dispose();
+    addressController.dispose();
+    easyPaisaController.dispose();
+    jazzCashController.dispose();
+    bankDetailsController.dispose();
+    remarksController.dispose();
 
     userFocusNode.dispose();
     super.dispose();
@@ -162,7 +169,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 SizedBox(
                                   width: 130, // 👈 first field ka fixed width
                                   child: AppTextField(
-                                    controller: passwordController,
+                                    controller: countryCodeController,
                                     hintText: "",
                                     prefixImage: "iconpakistan.png",
                                     suffixImage: "icondropdown.png",
@@ -202,7 +209,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             ),
                             const SizedBox(height: 16),
                             AppTextField(
-                              controller: experienceInYearsController,
+                              controller: addressController,
                               hintText: "Enter your Full Address",
                               prefixImage: "iconaddress.png",
                             ),
@@ -234,16 +241,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             PrimaryButton(
                               text: 'Sign Up',
                               onPressed: () {
-                                // userregistration();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const RegistrationSuccessful(),
-                                  ),
-                                );
+                                userregistration();
                               },
-                              enabled: true,
+                              enabled: isButtonEnabled,
                             ),
                             const SizedBox(height: 10),
                             Row(

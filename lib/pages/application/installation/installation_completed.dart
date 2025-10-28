@@ -28,38 +28,45 @@ class InstallationSuccessfull extends StatelessWidget {
                 children: [
                   SizedBox(height: 50),
                   Image.asset("${kIconFolder}iconsuccessful.png", height: 240),
-                  Text(
-                    beforePoints,
-                    style: GoogleFonts.inter(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      children: [
+                        Text(
+                          beforePoints,
+                          style: GoogleFonts.inter(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              points,
+                              style: GoogleFonts.inter(
+                                fontSize: 36,
+                                fontWeight: FontWeight.w600,
+                                color: kPrimaryColor,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              afterPoints,
+                              style: GoogleFonts.inter(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        points,
-                        style: GoogleFonts.inter(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w600,
-                          color: kPrimaryColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        afterPoints,
-                        style: GoogleFonts.inter(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
                   ),
                   Text(
                     'Keep going to unlock more rewards',

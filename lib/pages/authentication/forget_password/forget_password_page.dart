@@ -66,26 +66,18 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                   AuthenticationHeaderText(
                     title: 'Forgot Password?',
                     subtitle:
-                        'If you’ve forgotten your password, enter your email below',
+                        'If you’ve forgotten your password, enter your phone below',
                   ),
                   AppTextField(
                     controller: phoneNumberController,
-                    hintText: "Enter your email address",
-                    prefixImage: "iconmessage.png",
+                    hintText: "Enter your Phone Number",
+                    prefixImage: "iconphonenumber.png",
                   ),
                   const SizedBox(height: 20),
                   PrimaryButton(
                     text: 'Confirm',
                     onPressed: () {
-                      // forgotPassword();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EnterOTPPage(
-                            phoneNumber: phoneNumberController.text,
-                          ),
-                        ),
-                      );
+                      forgotPassword();
                     },
                     enabled: isButtonEnabled,
                   ),

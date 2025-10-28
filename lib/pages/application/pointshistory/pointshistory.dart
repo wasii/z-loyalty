@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/models/points_inventory_history_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
@@ -41,24 +42,36 @@ class _PointsHistoryViewState extends State<PointsHistoryView> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          ...points.map((point) {
-                            // Check if points already has a sign
-                            String pointsStr = point.points.toString();
-                            if (!pointsStr.startsWith('-')) {
-                              pointsStr = '+$pointsStr';
-                            }
-
-                            return Column(
-                              children: [
-                                PointsHistoryCell(
-                                  detail: point.details,
-                                  inventorytype: point.inventoryType,
-                                  points: pointsStr,
+                          if (points.isEmpty)
+                            Center(
+                              child: Text(
+                                'No Data Found',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: kTextFieldPlaceholderColor,
                                 ),
-                                SizedBox(height: 5),
-                              ],
-                            );
-                          }).toList(),
+                              ),
+                            )
+                          else
+                            ...points.map((point) {
+                              // Check if points already has a sign
+                              String pointsStr = point.points.toString();
+                              if (!pointsStr.startsWith('-')) {
+                                pointsStr = '+$pointsStr';
+                              }
+
+                              return Column(
+                                children: [
+                                  PointsHistoryCell(
+                                    detail: point.details,
+                                    inventorytype: point.inventoryType,
+                                    points: pointsStr,
+                                  ),
+                                  SizedBox(height: 5),
+                                ],
+                              );
+                            }).toList(),
                         ],
                       ),
                     ),
@@ -81,7 +94,7 @@ class _PointsHistoryViewState extends State<PointsHistoryView> {
       final response = await api.request(
         path: GetPointsInventoryHistory,
         type: RequestType.post,
-        data: {'user_id': 65}, //user?.id ?? 0},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 

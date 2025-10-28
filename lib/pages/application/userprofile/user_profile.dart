@@ -2,10 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/secondary_button.dart';
-import 'package:loyalty_program/pages/application/userprofile/edit_user_profile.dart';
+import 'package:loyalty_program/models/user_model.dart';
+import 'package:loyalty_program/network/user_pref_services.dart';
 
-class UserProfile extends StatelessWidget {
+class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
+
+  @override
+  State<UserProfile> createState() => _UserProfileState();
+}
+
+class _UserProfileState extends State<UserProfile> {
+  UserModel? _user;
+  bool _loading = true;
+  String _display(String? value) {
+    if (value == null) return 'N/A';
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? 'N/A' : trimmed;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final user = await UserPrefsService.getUser();
+    if (!mounted) return;
+    setState(() {
+      _user = user;
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,37 +50,50 @@ class UserProfile extends StatelessWidget {
                 children: [
                   UserProfileHeader(),
                   SizedBox(height: 20),
-                  UserProfileRowCell(title: 'Full Name', value: 'Afif Shaukat'),
-                  SizedBox(height: 5),
-                  UserProfileRowCell(title: 'Username', value: 'afif.shaukat'),
-                  SizedBox(height: 5),
-                  UserProfileRowCell(title: 'Contact', value: '+923345067987'),
-
-                  SizedBox(height: 5),
-                  UserProfileRowCell(title: 'Email', value: 'abc@gmail.com'),
-
-                  SizedBox(height: 5),
-                  UserProfileRowCell(title: 'City', value: 'Punjab'),
-
-                  SizedBox(height: 5),
-                  UserProfileRowCell(
-                    title: 'Address',
-                    value: 'Lahi Bazar Akhara Chooni Pehlwan, Sialkot, Punjab',
-                  ),
-
-                  SizedBox(height: 5),
-                  UserProfileRowCell(
-                    title: 'Bank Account',
-                    value: 'PK40MEZN0000001123456702',
-                  ),
-
-                  SizedBox(height: 20),
-
-                  SecondaryButton(
-                    text: 'Delete Account',
-                    onPressed: () {},
-                    textColor: kErrorBackColor,
-                  ),
+                  if (_loading)
+                    Center(child: CircularProgressIndicator())
+                  else ...[
+                    UserProfileRowCell(
+                      title: 'Full Name',
+                      value: _display(_user?.name),
+                    ),
+                    SizedBox(height: 5),
+                    UserProfileRowCell(
+                      title: 'Username',
+                      value: _display(_user?.username),
+                    ),
+                    SizedBox(height: 5),
+                    UserProfileRowCell(
+                      title: 'Contact',
+                      value: _display(_user?.contactNos),
+                    ),
+                    SizedBox(height: 5),
+                    UserProfileRowCell(
+                      title: 'Email',
+                      value: _display(_user?.email),
+                    ),
+                    SizedBox(height: 5),
+                    UserProfileRowCell(
+                      title: 'City',
+                      value: _display(_user?.city),
+                    ),
+                    SizedBox(height: 5),
+                    UserProfileRowCell(
+                      title: 'Address',
+                      value: _display(_user?.address),
+                    ),
+                    SizedBox(height: 5),
+                    UserProfileRowCell(
+                      title: 'Bank Account',
+                      value: _display(_user?.bankAccountDetails),
+                    ),
+                    SizedBox(height: 20),
+                    SecondaryButton(
+                      text: 'Delete Account',
+                      onPressed: () {},
+                      textColor: kErrorBackColor,
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -81,9 +123,18 @@ class UserProfileHeader extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const EditUserProfile()),
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: const Text('Coming soon'),
+                content: const Text('This feature is coming soon.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
             );
           },
           style: ElevatedButton.styleFrom(

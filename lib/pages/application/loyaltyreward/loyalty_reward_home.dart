@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/custom_heading.dart';
 import 'package:loyalty_program/components/constants.dart';
-import 'package:loyalty_program/pages/application/loyaltyreward/components/loyalty_reward_history.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/models/loyalty_rewards_model.dart';
@@ -44,18 +43,30 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
                     pointsSpent: pointsSpent.toString(),
                   ),
                   const SizedBox(height: 20),
-                  ...rewards.expand(
-                    (reward) => [
-                      LoyaltyRewardCell(
-                        title: reward.rewardName,
-                        points: reward.points,
-                        date: reward.customDate,
-                        time: reward.customTime,
-                        imagePath: reward.rewardImage,
+                  if (rewards.isEmpty)
+                    Center(
+                      child: Text(
+                        'No Data Found',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: kTextFieldPlaceholderColor,
+                        ),
                       ),
-                      const SizedBox(height: 5),
-                    ],
-                  ),
+                    )
+                  else
+                    ...rewards.expand(
+                      (reward) => [
+                        LoyaltyRewardCell(
+                          title: reward.rewardName,
+                          points: reward.points,
+                          date: reward.customDate,
+                          time: reward.customTime,
+                          imagePath: reward.rewardImage,
+                        ),
+                        const SizedBox(height: 5),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -74,7 +85,7 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
       final response = await api.request(
         path: GetLoyaltyRewards,
         type: RequestType.post,
-        data: {'user_id': 65}, //user?.id ?? 0},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 
