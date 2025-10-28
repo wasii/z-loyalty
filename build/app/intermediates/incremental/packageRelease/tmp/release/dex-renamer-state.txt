@@ -1,0 +1,4 @@
+#Tue Oct 28 12:54:09 PKT 2025
+base.0=/Users/wasiqsaleem/Desktop/flutter_app/z-loyalty/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

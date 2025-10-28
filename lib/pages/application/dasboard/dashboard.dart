@@ -239,7 +239,7 @@ class PointsBalance extends StatelessWidget {
                 ),
               ),
               Text(
-                "Jan 13, 2026",
+                "N/A",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
