@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:loyalty_program/components/constants.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
   const BarcodeScannerPage({super.key});
@@ -21,6 +23,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   bool hasError = false;
   String? errorMessage;
   bool showSuccessOverlay = false;
+  bool isInitializing = true;
 
   @override
   void initState() {
@@ -29,17 +32,42 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   }
 
   Future<void> _initializeCamera() async {
+    setState(() {
+      isInitializing = true;
+      hasError = false;
+    });
+
     try {
       // Check if we're on a real device
       if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
+        // Request camera permission first
+        final permissionStatus = await Permission.camera.request();
+
+        if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
+          if (mounted) {
+            setState(() {
+              hasError = true;
+              isInitializing = false;
+              errorMessage = permissionStatus.isPermanentlyDenied
+                  ? 'Camera permission is permanently denied. Please enable it from app settings.'
+                  : 'Camera permission is required to scan barcodes.';
+            });
+          }
+          return;
+        }
+
+        // Permission granted, initialize camera
         cameraController = MobileScannerController(
           detectionSpeed: DetectionSpeed.noDuplicates,
           returnImage: true, // Enable image capture
         );
+
         await cameraController!.start();
+
         if (mounted) {
           setState(() {
             hasError = false;
+            isInitializing = false;
           });
         }
       } else {
@@ -47,6 +75,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
         if (mounted) {
           setState(() {
             hasError = true;
+            isInitializing = false;
             errorMessage = 'Camera not available on simulator';
           });
         }
@@ -55,6 +84,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       if (mounted) {
         setState(() {
           hasError = true;
+          isInitializing = false;
           errorMessage = 'Camera error: ${e.toString()}';
         });
       }
@@ -129,7 +159,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   }
 
   Widget _buildScannerScreen() {
-    if (cameraController == null) {
+    if (isInitializing || cameraController == null) {
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
       );
@@ -238,6 +268,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   }
 
   Widget _buildManualInputScreen() {
+    final isPermissionDenied = errorMessage?.contains('permission') ?? false;
+    final isPermanentlyDenied = errorMessage?.contains('permanently') ?? false;
+
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -259,6 +292,38 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
           ),
+          if (isPermissionDenied) ...[
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () async {
+                  // Try to open app settings if permanently denied
+                  if (isPermanentlyDenied) {
+                    await openAppSettings();
+                  } else {
+                    // Retry permission request
+                    await _initializeCamera();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  isPermanentlyDenied ? 'Open Settings' : 'Retry Camera',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 32),
           Container(
             decoration: BoxDecoration(

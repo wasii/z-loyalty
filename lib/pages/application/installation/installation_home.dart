@@ -36,9 +36,9 @@ class _InstallationHomeState extends State<InstallationHome> {
 
   void _onTextChanged() {
     setState(() {
-      isVerifyButtonEnabled = inputController.text.length == 8;
+      isVerifyButtonEnabled = inputController.text.isNotEmpty;
       // Reset verification status when text changes
-      if (inputController.text.length != 8) {
+      if (inputController.text.isEmpty) {
         isVerified = false;
       }
     });
@@ -141,9 +141,7 @@ class _InstallationHomeState extends State<InstallationHome> {
                                           right: 8,
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(
-                                                0.6,
-                                              ),
+                                              color: Colors.black.withAlpha(60),
                                               shape: BoxShape.circle,
                                             ),
                                             child: IconButton(
@@ -273,7 +271,6 @@ class _InstallationHomeState extends State<InstallationHome> {
                               controller: inputController,
                               hintText: 'Loyalty Code',
                               prefixImage: "iconcard.png",
-                              maxLength: 8,
                             ),
                             SizedBox(height: 25),
                             Row(

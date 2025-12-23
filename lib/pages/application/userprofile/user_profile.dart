@@ -88,11 +88,6 @@ class _UserProfileState extends State<UserProfile> {
                       value: _display(_user?.bankAccountDetails),
                     ),
                     SizedBox(height: 20),
-                    SecondaryButton(
-                      text: 'Delete Account',
-                      onPressed: () {},
-                      textColor: kErrorBackColor,
-                    ),
                   ],
                 ],
               ),

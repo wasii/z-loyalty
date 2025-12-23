@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
               // Username field
               AppTextField(
                 controller: usernameController,
-                hintText: "Enter your username",
+                hintText: "Enter your Mobile Number",
                 prefixImage: "iconusername.png",
               ),
               const SizedBox(height: 16),

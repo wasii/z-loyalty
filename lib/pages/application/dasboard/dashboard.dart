@@ -54,28 +54,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   PointsBalance(points: _points),
 
                   SizedBox(height: 20),
-                  PrizeBox(
-                    title: 'Cash Prize',
-                    value: '300',
-                    prize: 'PKR 30,000',
-                    imagePath: '${kIconFolder}iconcash.png',
-                  ),
-
-                  const SizedBox(height: 20),
-                  PrizeBox(
-                    title: 'Bike Prize',
-                    value: '1500',
-                    prize: 'Your Bike',
-                    imagePath: '${kIconFolder}iconbike.png',
-                  ),
-
-                  const SizedBox(height: 20),
-                  PrizeBox(
-                    title: 'Umrah Package',
-                    value: '3000',
-                    prize: 'Your Umrah Ticket',
-                    imagePath: '${kIconFolder}iconumrah.png',
-                  ),
+                  // Scheme details images
+                  if (dashboardPointsModel?.schemeDetails != null)
+                    ...dashboardPointsModel!.schemeDetails.map((scheme) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 180,
+                            child: Image.network(
+                              scheme.picUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      height: 180,
+                                      color: Colors.grey[200],
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          value:
+                                              loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 180,
+                                  color: Colors.grey[300],
+                                  child: Icon(Icons.image_not_supported),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                 ],
               ),
             ),
@@ -108,6 +132,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           dashboardPointsModel = dashboard;
           kUserPoints = dashboard.myCurrentAvailablePoints;
         });
+        // Save dashboard data globally
+        await UserPrefsService.saveDashboardData(dashboard);
       }
     } catch (e) {
       showDialog(
@@ -186,7 +212,7 @@ class PointsBalance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 138,
+      height: 100,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: kPrimaryColor,
@@ -227,27 +253,27 @@ class PointsBalance extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              Text(
-                "Expiration Date: ",
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                "N/A",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
+          // const SizedBox(height: 18),
+          // Row(
+          //   children: [
+          //     Text(
+          //       "Expiration Date: ",
+          //       style: GoogleFonts.inter(
+          //         fontSize: 16,
+          //         fontWeight: FontWeight.w400,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //     Text(
+          //       "N/A",
+          //       style: TextStyle(
+          //         fontSize: 16,
+          //         fontWeight: FontWeight.w600,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
