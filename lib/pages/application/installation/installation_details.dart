@@ -20,11 +20,13 @@ import 'package:loyalty_program/components/loader.dart';
 class InstallationDetails extends StatefulWidget {
   final String serialNumber;
   final String? barcodeFormat;
+  final String? itemId;
 
   const InstallationDetails({
     super.key,
     required this.serialNumber,
     this.barcodeFormat,
+    this.itemId,
   });
 
   @override
@@ -56,7 +58,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
   @override
   void initState() {
     super.initState();
-    _loadUser();
+    // _loadUser();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getAllItems();
     });
@@ -211,7 +213,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                     CustomHeading(heading: 'Enter Installation Details'),
                     SizedBox(height: 20),
                     Container(
-                      height: 74,
+                      height: 44,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -226,20 +228,11 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.serialNumber,
+                            'Serial Number: ' + widget.serialNumber,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Colors.white70,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            'N/A',
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
                             ),
                           ),
                         ],
@@ -248,10 +241,9 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                     SizedBox(height: 20),
                     AppTextField(
                       controller: nameController,
-                      hintText: 'Full Name',
+                      hintText: 'Client Name',
                       editable: true,
                       prefixImage: "iconusername.png",
-                      prevalue: 'Afif Shaukat',
                     ),
                     SizedBox(height: 20),
                     Row(
@@ -270,39 +262,44 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                         Expanded(
                           child: AppTextField(
                             controller: phoneController,
-                            hintText: "Enter Phone number",
+                            hintText: "Client Mobile",
                             prefixImage: "iconphonenumber.png",
                             keyboardType: TextInputType.phone,
-                            prevalue: '333 1234567',
                           ),
                         ),
                       ],
                     ),
                     SizedBox(height: 20),
                     GestureDetector(
-                      onTap: () {
-                        _showProductsPopup(context);
-                      },
+                      onTap: widget.itemId != null && widget.itemId!.isNotEmpty
+                          ? null
+                          : () {
+                              _showProductsPopup(context);
+                            },
                       child: AbsorbPointer(
+                        absorbing:
+                            widget.itemId != null && widget.itemId!.isNotEmpty,
                         child: AppTextField(
                           controller: productController,
-                          hintText: 'Product',
+                          hintText: 'Item Installed',
                           prefixImage: 'iconproduct.png',
                           suffixImage: 'icondropdown.png',
+                          editable:
+                              widget.itemId == null || widget.itemId!.isEmpty,
                         ),
                       ),
                     ),
                     SizedBox(height: 20),
                     AppTextField(
                       controller: cityController,
-                      hintText: 'City',
-                      prefixImage: 'iconlocation.png',
-                      suffixImage: 'icondropdown.png',
+                      hintText: 'Installation City',
+                      editable: true,
+                      prefixImage: "iconlocation.png",
                     ),
                     SizedBox(height: 20),
                     AppTextField(
                       controller: addressController,
-                      hintText: 'Enter your Full Address',
+                      hintText: 'Installation Address',
                       prefixImage: 'iconaddress.png',
                     ),
 
@@ -312,7 +309,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                         Expanded(
                           child: AppTextField(
                             controller: installationController,
-                            hintText: 'Installation Proof',
+                            hintText: 'Upload Pics of Installation Site',
                             prefixImage: 'iconinstallation.png',
                             editable: false,
                           ),
@@ -402,7 +399,7 @@ class _InstallationDetailsState extends State<InstallationDetails> {
                     SizedBox(height: 20),
                     AppTextField(
                       controller: remarksController,
-                      hintText: 'Enter your Remarks',
+                      hintText: 'Remarks',
                       prefixImage: 'iconchat.png',
                     ),
                     SizedBox(height: 20),
@@ -438,6 +435,19 @@ class _InstallationDetailsState extends State<InstallationDetails> {
       final allItem = AllItemsResponse.fromJson(json);
       if (allItem.error == 0) {
         items = allItem.items;
+        // If itemId is provided, find and set the product name, then disable the field
+        if (widget.itemId != null && widget.itemId!.isNotEmpty) {
+          final foundItem = items.firstWhere(
+            (item) => item.id == widget.itemId,
+            orElse: () => Item(id: '', name: ''),
+          );
+          if (foundItem.id.isNotEmpty) {
+            setState(() {
+              selectedItem = foundItem;
+              productController.text = foundItem.name;
+            });
+          }
+        }
       }
     } catch (e) {
       print(e.toString());

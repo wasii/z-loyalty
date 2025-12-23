@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/constants.dart';
-import 'package:loyalty_program/components/secondary_button.dart';
 import 'package:loyalty_program/models/user_model.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 

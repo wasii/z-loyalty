@@ -27,6 +27,7 @@ class _InstallationHomeState extends State<InstallationHome> {
   String? scannedBarcode;
   Uint8List? scannedImage;
   String? barcodeFormat;
+  String? itemId;
 
   @override
   void initState() {
@@ -293,6 +294,7 @@ class _InstallationHomeState extends State<InstallationHome> {
                                           builder: (_) => InstallationDetails(
                                             serialNumber: inputController.text,
                                             barcodeFormat: barcodeFormat,
+                                            itemId: itemId,
                                           ),
                                         ),
                                       );
@@ -341,9 +343,13 @@ class _InstallationHomeState extends State<InstallationHome> {
       final json = response.data;
       final verify_serial = VerifySerialNumberModel.fromJson(json);
       if (verify_serial.error == 0) {
+        if (verify_serial.isSystemSerial == 1) {
+          itemId = verify_serial.itemId;
+        }
         setState(() {
           isVerified = true;
         });
+        itemId = verify_serial.itemId;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Serial number verified successfully!'),
@@ -371,6 +377,21 @@ class _InstallationHomeState extends State<InstallationHome> {
           ),
         );
       }
+      // if (verify_serial.isSystemSerial == 0) {
+      //    else {
+      //   setState(() {
+      //     isVerified = true;
+      //   });
+      //   itemId = verify_serial.itemId;
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('Serial number verified successfully!'),
+      //       backgroundColor: kPrimaryColor,
+      //       duration: Duration(seconds: 2),
+      //     ),
+      //   );
+      // }
+      // }
     } catch (e) {
       setState(() {
         isVerified = false;

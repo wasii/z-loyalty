@@ -41,16 +41,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       // Check if we're on a real device
       if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
         // Request camera permission first
-        final permissionStatus = await Permission.camera.request();
-
-        if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
+        final hasPermission = await Permission.camera.request();
+        if (hasPermission.isDenied) {
           if (mounted) {
             setState(() {
               hasError = true;
               isInitializing = false;
-              errorMessage = permissionStatus.isPermanentlyDenied
-                  ? 'Camera permission is permanently denied. Please enable it from app settings.'
-                  : 'Camera permission is required to scan barcodes.';
+              errorMessage = 'Camera permission is required to scan barcodes.';
             });
           }
           return;
@@ -176,7 +173,27 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               final Uint8List? image = capture.image;
 
               if (barcodes.isNotEmpty) {
-                final barcode = barcodes.first;
+                // Filter out QR codes - only accept barcodes
+                final barcodeList = barcodes
+                    .where((barcode) => barcode.format != BarcodeFormat.qrCode)
+                    .toList();
+
+                if (barcodeList.isEmpty) {
+                  // QR code detected, show message and reset
+                  setState(() {
+                    isScanned = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please scan a barcode, not a QR code'),
+                      backgroundColor: Colors.orange,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
+
+                final barcode = barcodeList.first;
 
                 // Show success feedback
                 setState(() {
@@ -253,7 +270,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'Place barcode within the frame to scan',
+                'Place barcode within the frame to scan\n(QR codes not supported)',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 14,
@@ -269,7 +286,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
 
   Widget _buildManualInputScreen() {
     final isPermissionDenied = errorMessage?.contains('permission') ?? false;
-    final isPermanentlyDenied = errorMessage?.contains('permanently') ?? false;
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -299,13 +315,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               height: 50,
               child: ElevatedButton(
                 onPressed: () async {
-                  // Try to open app settings if permanently denied
-                  if (isPermanentlyDenied) {
-                    await openAppSettings();
-                  } else {
-                    // Retry permission request
-                    await _initializeCamera();
-                  }
+                  // Retry permission request
+                  await _initializeCamera();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kPrimaryColor,
@@ -314,7 +325,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                   ),
                 ),
                 child: Text(
-                  isPermanentlyDenied ? 'Open Settings' : 'Retry Camera',
+                  'Retry Camera',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

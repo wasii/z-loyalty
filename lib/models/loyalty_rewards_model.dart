@@ -82,25 +82,50 @@ class LoyaltyReward {
     }
   }
 
-  // Computed properties for date and time from rewardedOn
+  // Computed properties for date and time
+  // For completed: shows rewardedOn
+  // For rejected: shows rejectedOn
+  // For pending: shows addedOn or date
   String get customDate {
-    if (rewardedOn == null || rewardedOn!.isEmpty) {
+    String? dateToUse;
+    if (isRewarded && rewardedOn != null && rewardedOn!.isNotEmpty) {
+      dateToUse = rewardedOn;
+    } else if (isRejected && rejectedOn != null && rejectedOn!.isNotEmpty) {
+      dateToUse = rejectedOn;
+    } else if (addedOn.isNotEmpty) {
+      dateToUse = addedOn;
+    } else if (date.isNotEmpty) {
+      dateToUse = date;
+    }
+    
+    if (dateToUse == null || dateToUse.isEmpty) {
       return '';
     }
+    
     try {
-      DateTime dateTime = DateTime.parse(rewardedOn!);
+      DateTime dateTime = DateTime.parse(dateToUse);
       return DateFormat('MMM dd, yyyy').format(dateTime);
     } catch (e) {
-      return rewardedOn ?? '';
+      return dateToUse;
     }
   }
 
   String get customTime {
-    if (rewardedOn == null || rewardedOn!.isEmpty) {
+    String? dateToUse;
+    if (isRewarded && rewardedOn != null && rewardedOn!.isNotEmpty) {
+      dateToUse = rewardedOn;
+    } else if (isRejected && rejectedOn != null && rejectedOn!.isNotEmpty) {
+      dateToUse = rejectedOn;
+    } else if (addedOn.isNotEmpty) {
+      dateToUse = addedOn;
+    }
+    
+    if (dateToUse == null || dateToUse.isEmpty) {
       return '';
     }
+    
     try {
-      DateTime dateTime = DateTime.parse(rewardedOn!);
+      DateTime dateTime = DateTime.parse(dateToUse);
       return DateFormat('hh:mm a').format(dateTime);
     } catch (e) {
       return '';

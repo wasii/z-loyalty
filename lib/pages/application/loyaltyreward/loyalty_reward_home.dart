@@ -17,12 +17,30 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
   bool isLoading = false;
   List<LoyaltyReward> rewards = [];
   int pointsSpent = 0;
+  bool isPendingExpanded = false;
+  bool isCompletedExpanded = false;
+  bool isRejectedExpanded = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getLoyaltyRewardList();
     });
+  }
+
+  List<LoyaltyReward> get pendingRewards {
+    return rewards
+        .where((reward) => !reward.isRewarded && !reward.isRejected)
+        .toList();
+  }
+
+  List<LoyaltyReward> get completedRewards {
+    return rewards.where((reward) => reward.isRewarded).toList();
+  }
+
+  List<LoyaltyReward> get rejectedRewards {
+    return rewards.where((reward) => reward.isRejected).toList();
   }
 
   @override
@@ -55,16 +73,43 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
                       ),
                     )
                   else
-                    ...rewards.expand(
-                      (reward) => [
-                        LoyaltyRewardCell(
-                          title: reward.rewardName,
-                          points: reward.points,
-                          date: reward.customDate,
-                          time: reward.customTime,
-                          imagePath: reward.rewardImage,
+                    Column(
+                      children: [
+                        _ExpandableTab(
+                          title: 'Pending (Claimed)',
+                          count: pendingRewards.length,
+                          isExpanded: isPendingExpanded,
+                          onTap: () {
+                            setState(() {
+                              isPendingExpanded = !isPendingExpanded;
+                            });
+                          },
+                          rewards: pendingRewards,
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 12),
+                        _ExpandableTab(
+                          title: 'Rewarded',
+                          count: completedRewards.length,
+                          isExpanded: isCompletedExpanded,
+                          onTap: () {
+                            setState(() {
+                              isCompletedExpanded = !isCompletedExpanded;
+                            });
+                          },
+                          rewards: completedRewards,
+                        ),
+                        const SizedBox(height: 12),
+                        _ExpandableTab(
+                          title: 'Rejected',
+                          count: rejectedRewards.length,
+                          isExpanded: isRejectedExpanded,
+                          onTap: () {
+                            setState(() {
+                              isRejectedExpanded = !isRejectedExpanded;
+                            });
+                          },
+                          rewards: rejectedRewards,
+                        ),
                       ],
                     ),
                 ],
@@ -85,7 +130,7 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
       final response = await api.request(
         path: GetLoyaltyRewards,
         type: RequestType.post,
-        data: {'user_id': user?.id ?? 0},
+        data: {'user_id': 65},
         useFormData: true,
       );
 
@@ -115,26 +160,6 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
     } finally {
       setState(() => isLoading = false);
     }
-  }
-}
-
-class _LoyaltyRewardHeaderState extends StatefulWidget {
-  const _LoyaltyRewardHeaderState();
-
-  @override
-  State<_LoyaltyRewardHeaderState> createState() =>
-      _LoyaltyRewardHeaderStateState();
-}
-
-class _LoyaltyRewardHeaderStateState extends State<_LoyaltyRewardHeaderState> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
 
@@ -253,6 +278,127 @@ class _PointsSpentCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ExpandableTab extends StatelessWidget {
+  const _ExpandableTab({
+    required this.title,
+    required this.count,
+    required this.isExpanded,
+    required this.onTap,
+    required this.rewards,
+  });
+
+  final String title;
+  final int count;
+  final bool isExpanded;
+  final VoidCallback onTap;
+  final List<LoyaltyReward> rewards;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: kPrimaryColor, width: 1),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: kTextFieldHeadingNameColor,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: kPrimaryColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        count.toString(),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(
+                  isExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: kPrimaryColor,
+                  size: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (isExpanded && rewards.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Column(
+              children: rewards
+                  .expand(
+                    (reward) => [
+                      LoyaltyRewardCell(
+                        title: reward.rewardName,
+                        points: reward.points,
+                        date: reward.customDate,
+                        time: reward.customTime,
+                        imagePath: reward.rewardImage,
+                      ),
+                      const SizedBox(height: 5),
+                    ],
+                  )
+                  .toList(),
+            ),
+          ),
+        if (isExpanded && rewards.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: kBoxBackgroundColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  'No $title Rewards',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: kTextFieldPlaceholderColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
