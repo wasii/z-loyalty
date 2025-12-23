@@ -6,6 +6,7 @@ import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/components/secondary_button.dart';
 import 'package:loyalty_program/models/claim_points_model.dart';
 import 'package:loyalty_program/models/claim_reward_model.dart';
+import 'package:loyalty_program/models/dashboard_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/application/claimpoints/components/claim_point_earning_cell.dart';
@@ -27,11 +28,13 @@ class _ClaimPointsState extends State<ClaimPoints> {
   bool showCash = false;
   bool showBike = false;
   bool showUmrah = false;
+  List<SchemeDetail> schemeDetails = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadDashboardData();
       getClaimPoints();
     });
   }
@@ -50,51 +53,38 @@ class _ClaimPointsState extends State<ClaimPoints> {
                 children: [
                   ClaimPointsHeaderSection(),
                   SizedBox(height: 20),
-                  ClaimPointRewardSection(
-                    title: 'Claim Cash',
-                    points: '300',
-                    imagePath: '${kIconFolder}iconcash.png',
-                    onClaim: () {
-                      showCustomPopup(
-                        context,
-                        'Claim Cash',
-                        'iconcash',
-                        'Cash',
-                      );
-                    },
-                    editable: showCash,
-                  ),
-                  SizedBox(height: 10),
-                  ClaimPointRewardSection(
-                    title: 'Bike Prize',
-                    points: '1000',
-                    imagePath: '${kIconFolder}iconbike.png',
-                    onClaim: () {
-                      showCustomPopup(
-                        context,
-                        'Claim Bike',
-                        'iconbike',
-                        'Bike',
-                      );
-                    },
-                    editable: showBike,
-                  ),
-                  SizedBox(height: 10),
-                  ClaimPointRewardSection(
-                    title: 'Umrah Package',
-                    points: '3000',
-                    imagePath: '${kIconFolder}iconumrah.png',
-                    onClaim: () {
-                      showCustomPopup(
-                        context,
-                        'Claim Umrah Package',
-                        'iconumrah',
-                        'Umrah',
-                      );
-                    },
-                    editable: showUmrah,
-                  ),
+                  if (schemeDetails.isNotEmpty)
+                    ...schemeDetails.map((scheme) {
+                      final userPoints = int.tryParse(kUserPoints) ?? 0;
+                      final minPoints = int.tryParse(scheme.minPoints) ?? 0;
+                      final isEditable = userPoints >= minPoints;
 
+                      // Extract path after mobile_app_apis/
+                      String claimPath = '';
+                      if (scheme.claimUrl.contains('mobile_app_apis/')) {
+                        final index =
+                            scheme.claimUrl.indexOf('mobile_app_apis/') +
+                            'mobile_app_apis/'.length;
+                        claimPath = scheme.claimUrl.substring(index);
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: ClaimPointRewardSection(
+                          title: scheme.itemName,
+                          points: scheme.minPoints,
+                          imagePath: scheme.picUrl,
+                          onClaim: () {
+                            showCustomPopup(
+                              context,
+                              scheme.itemName,
+                              claimPath,
+                            );
+                          },
+                          editable: isEditable,
+                        ),
+                      );
+                    }).toList(),
                   SizedBox(height: 20),
                   ClaimPointsEarningHeadingSection(claims: claims),
                   SizedBox(height: 10),
@@ -135,12 +125,7 @@ class _ClaimPointsState extends State<ClaimPoints> {
     );
   }
 
-  void showCustomPopup(
-    BuildContext parentContext,
-    String title,
-    String icon,
-    String reward,
-  ) {
+  void showCustomPopup(BuildContext parentContext, String title, String path) {
     final TextEditingController _controller = TextEditingController();
 
     showDialog(
@@ -155,22 +140,13 @@ class _ClaimPointsState extends State<ClaimPoints> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                /// Image
-                Image.asset(
-                  title == 'Claim Bike'
-                      ? '${kBGFolder}bgBike.png'
-                      : '$kIconFolder$icon.png',
-                  height: 134,
-                  width: 230,
-                ),
-
                 const SizedBox(height: 16),
 
                 /// Title / Text
                 Text(
-                  "Are you Sure to\n$title",
+                  "Are you sure to claim\n$title",
                   style: GoogleFonts.inter(
-                    fontSize: 26,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                     color: kTextFieldHeadingNameColor,
                   ),
@@ -206,13 +182,7 @@ class _ClaimPointsState extends State<ClaimPoints> {
                         onPressed: () {
                           print("User typed: ${_controller.text}");
                           Navigator.pop(context);
-                          if (title == 'Claim Cash') {
-                            claimCash(_controller.text);
-                          } else if (title == 'Claim Bike') {
-                            claimBike(_controller.text);
-                          } else if (title == 'Claim Umrah') {
-                            claimUmrah(_controller.text);
-                          }
+                          claimReward(path, _controller.text);
                         },
                       ),
                     ),
@@ -224,6 +194,19 @@ class _ClaimPointsState extends State<ClaimPoints> {
         );
       },
     );
+  }
+
+  void loadDashboardData() async {
+    try {
+      final dashboardData = await UserPrefsService.getDashboardData();
+      if (dashboardData != null && mounted) {
+        setState(() {
+          schemeDetails = dashboardData.schemeDetails;
+        });
+      }
+    } catch (e) {
+      // Silently handle error, dashboard data is optional
+    }
   }
 
   void getClaimPoints() async {
@@ -268,13 +251,13 @@ class _ClaimPointsState extends State<ClaimPoints> {
     }
   }
 
-  void claimCash(String remarks) async {
+  void claimReward(String path, String remarks) async {
     setState(() => isLoading = true);
     try {
       var user = await UserPrefsService.getUser();
       final api = ApiService();
       final response = await api.request(
-        path: GetClaimPoints,
+        path: path,
         type: RequestType.post,
         data: {'user_id': user?.id ?? 0, 'remarks': remarks},
         useFormData: true,
@@ -312,122 +295,6 @@ class _ClaimPointsState extends State<ClaimPoints> {
         context: context,
         builder: (_) => AlertDialog(
           title: const Text("Claim Cash Failed"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  void claimBike(String remarks) async {
-    setState(() => isLoading = true);
-    try {
-      var user = await UserPrefsService.getUser();
-      final api = ApiService();
-      final response = await api.request(
-        path: GetClaimPoints,
-        type: RequestType.post,
-        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
-        useFormData: true,
-      );
-
-      final json = response.data;
-      final claimReward = ClaimRewardModel.fromJson(json);
-      if (claimReward.error == 0) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ClaimPointSuccessful(
-              rewardName: 'Bike',
-              icon: '${kIconFolder}iconbike.png',
-            ),
-          ),
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text("Claim Bike Failed"),
-            content: Text(claimReward.message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Claim Bike Failed"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  void claimUmrah(String remarks) async {
-    setState(() => isLoading = true);
-    try {
-      var user = await UserPrefsService.getUser();
-      final api = ApiService();
-      final response = await api.request(
-        path: GetClaimPoints,
-        type: RequestType.post,
-        data: {'user_id': user?.id ?? 0, 'remarks': remarks},
-        useFormData: true,
-      );
-
-      final json = response.data;
-      final claimReward = ClaimRewardModel.fromJson(json);
-      if (claimReward.error == 0) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ClaimPointSuccessful(
-              rewardName: 'Umrah',
-              icon: '${kIconFolder}iconumrah.png',
-            ),
-          ),
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text("Claim Umrah Failed"),
-            content: Text(claimReward.message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Claim Umrah Failed"),
           content: Text(e.toString()),
           actions: [
             TextButton(

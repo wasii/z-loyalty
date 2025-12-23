@@ -120,7 +120,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final response = await api.request(
         path: DashboardGetPoints,
         type: RequestType.post,
-        data: {'user_id': user?.id},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 

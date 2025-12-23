@@ -38,12 +38,29 @@ class ClaimPointRewardSection extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30), // half of width/height
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.contain,
-                width: 40,
-                height: 40,
-              ),
+              child:
+                  imagePath.startsWith('http://') ||
+                      imagePath.startsWith('https://')
+                  ? Image.network(
+                      imagePath,
+                      fit: BoxFit.contain,
+                      width: 40,
+                      height: 40,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 40,
+                          height: 40,
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image_not_supported, size: 20),
+                        );
+                      },
+                    )
+                  : Image.asset(
+                      imagePath,
+                      fit: BoxFit.contain,
+                      width: 40,
+                      height: 40,
+                    ),
             ),
           ),
           SizedBox(width: 20),

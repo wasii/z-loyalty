@@ -5,6 +5,8 @@ import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/models/loyalty_rewards_model.dart';
+import 'package:loyalty_program/models/dashboard_model.dart';
+import 'package:loyalty_program/pages/application/claimpoints/components/claim_points_reward.dart';
 
 class LoyaltyRewardHome extends StatefulWidget {
   const LoyaltyRewardHome({super.key});
@@ -20,11 +22,13 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
   bool isPendingExpanded = false;
   bool isCompletedExpanded = false;
   bool isRejectedExpanded = false;
+  List<SchemeDetail> schemeDetails = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadDashboardData();
       getLoyaltyRewardList();
     });
   }
@@ -61,6 +65,26 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
                     pointsSpent: pointsSpent.toString(),
                   ),
                   const SizedBox(height: 20),
+                  if (schemeDetails.isNotEmpty)
+                    Column(
+                      children: [
+                        ...schemeDetails.map((scheme) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: ClaimPointRewardSection(
+                              title: scheme.itemName,
+                              points: scheme.minPoints,
+                              imagePath: scheme.picUrl,
+                              onClaim: () {
+                                // Handle claim action if needed
+                              },
+                              editable: true,
+                            ),
+                          );
+                        }).toList(),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   if (rewards.isEmpty)
                     Center(
                       child: Text(
@@ -121,16 +145,29 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
     );
   }
 
+  void loadDashboardData() async {
+    try {
+      final dashboardData = await UserPrefsService.getDashboardData();
+      if (dashboardData != null && mounted) {
+        setState(() {
+          schemeDetails = dashboardData.schemeDetails;
+        });
+      }
+    } catch (e) {
+      // Silently handle error, dashboard data is optional
+    }
+  }
+
   void getLoyaltyRewardList() async {
     setState(() => isLoading = true);
 
     try {
-      final api = ApiService();
       var user = await UserPrefsService.getUser();
+      final api = ApiService();
       final response = await api.request(
         path: GetLoyaltyRewards,
         type: RequestType.post,
-        data: {'user_id': 65},
+        data: {'user_id': user?.id ?? 0},
         useFormData: true,
       );
 
