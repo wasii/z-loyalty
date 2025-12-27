@@ -5,6 +5,7 @@ import 'package:loyalty_program/components/navigation_bar.dart';
 import 'package:loyalty_program/pages/application/claimpoints/claim_poinst.dart';
 import 'package:loyalty_program/pages/application/dasboard/dashboard.dart';
 import 'package:loyalty_program/pages/application/installation/installation_home.dart';
+import 'package:loyalty_program/pages/application/installation/installation_listing.dart';
 import 'package:loyalty_program/pages/application/loyaltyreward/loyalty_reward_home.dart';
 import 'package:loyalty_program/pages/application/sidemenu/side_menu.dart';
 import 'package:loyalty_program/pages/application/pointshistory/pointshistory.dart';
@@ -25,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _tabCurrentIndex = 0;
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const InstallationHome(),
+    const InstallationListing(),
     const ClaimPoints(),
     const LoyaltyRewardHome(),
     const PointsHistoryView(),

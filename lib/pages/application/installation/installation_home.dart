@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/app_text_field.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/custom_heading.dart';
+import 'package:loyalty_program/components/navigation_bar.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/components/secondary_button.dart';
 import 'package:loyalty_program/pages/application/installation/installation_details.dart';
@@ -81,6 +82,13 @@ class _InstallationHomeState extends State<InstallationHome> {
       behavior: HitTestBehavior.opaque,
       child: Scaffold(
         backgroundColor: Colors.white,
+        appBar: Navigator.canPop(context)
+            ? CustomNavigationBarWithBackButton(
+                onBackTap: () {
+                  Navigator.pop(context);
+                },
+              )
+            : null,
         body: Stack(
           children: [
             SafeArea(

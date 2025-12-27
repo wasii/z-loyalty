@@ -162,8 +162,8 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
     setState(() => isLoading = true);
 
     try {
-      var user = await UserPrefsService.getUser();
       final api = ApiService();
+      var user = await UserPrefsService.getUser();
       final response = await api.request(
         path: GetLoyaltyRewards,
         type: RequestType.post,
