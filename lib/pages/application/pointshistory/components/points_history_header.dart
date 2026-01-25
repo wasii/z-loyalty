@@ -12,35 +12,35 @@ class PointsHistoryHeader extends StatelessWidget {
       children: [
         CustomHeading(heading: 'Points History'),
         Spacer(),
-        IntrinsicWidth(
-          child: Container(
-            height: 36,
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: kPrimaryColor, width: 1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Date: N/A',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: kTextFieldHeadingNameColor,
-                  ),
-                ),
-                SizedBox(width: 5),
-                Image.asset(
-                  '${kIconFolder}icondropdown.png',
-                  width: 10,
-                  height: 5.83,
-                ),
-              ],
-            ),
-          ),
-        ),
+        // IntrinsicWidth(
+        //   child: Container(
+        //     height: 36,
+        //     padding: EdgeInsets.symmetric(horizontal: 12),
+        //     decoration: BoxDecoration(
+        //       border: Border.all(color: kPrimaryColor, width: 1),
+        //       borderRadius: BorderRadius.circular(20),
+        //     ),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.center,
+        //       children: [
+        //         Text(
+        //           'Date: N/A',
+        //           style: GoogleFonts.inter(
+        //             fontSize: 12,
+        //             fontWeight: FontWeight.w500,
+        //             color: kTextFieldHeadingNameColor,
+        //           ),
+        //         ),
+        //         SizedBox(width: 5),
+        //         Image.asset(
+        //           '${kIconFolder}icondropdown.png',
+        //           width: 10,
+        //           height: 5.83,
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

@@ -460,12 +460,12 @@ class _InstallationItemState extends State<_InstallationItem>
                   ),
                 // Details Section
                 _DetailRow(
-                  label: 'Name:',
+                  label: 'Client Name:',
                   value: widget.installation.clientName,
                 ),
                 SizedBox(height: 8),
                 _DetailRow(
-                  label: 'Serial No.:',
+                  label: 'Serial Number:',
                   value: widget.installation.serialNumber,
                 ),
                 SizedBox(height: 8),
@@ -475,7 +475,7 @@ class _InstallationItemState extends State<_InstallationItem>
                 ),
                 SizedBox(height: 8),
                 _DetailRow(
-                  label: 'City:',
+                  label: 'Installation City:',
                   value: widget.installation.installationCity,
                 ),
                 SizedBox(height: 8),

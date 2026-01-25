@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loyalty_program/components/app_text_field.dart';
@@ -8,12 +10,14 @@ import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/primary_button.dart';
+import 'package:loyalty_program/models/force_update.dart';
 import 'package:loyalty_program/models/user_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/network/user_pref_services.dart';
 import 'package:loyalty_program/pages/application/homescreen.dart';
 import 'package:loyalty_program/pages/authentication/forget_password/forget_password_page.dart';
 import 'package:loyalty_program/pages/authentication/registration/registration_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,6 +40,10 @@ class _LoginPageState extends State<LoginPage> {
     usernameController.addListener(_updateButtonState);
     passwordController.addListener(_updateButtonState);
     _updateButtonState();
+    // Wait for widget to be fully mounted before calling API
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      force_update_check();
+    });
   }
 
   void _updateButtonState() {
@@ -259,6 +267,102 @@ class _LoginPageState extends State<LoginPage> {
       );
     } finally {
       setState(() => isLoading = false);
+    }
+  }
+
+  void force_update_check() async {
+    try {
+      final api = ApiService();
+
+      final request = await api.request(
+        path: "${ForeceUpdate}1",
+        type: RequestType.post,
+        data: {},
+        useFormData: false,
+      );
+
+      if (!mounted) return;
+
+      // Handle case where response.data might be a String or Map
+      dynamic jsonData = request.data;
+      Map<String, dynamic> json;
+
+      if (jsonData is String) {
+        // If it's a string, parse it as JSON
+        json = jsonDecode(jsonData) as Map<String, dynamic>;
+      } else if (jsonData is Map<String, dynamic>) {
+        // If it's already a Map, use it directly
+        json = jsonData;
+      } else {
+        // Fallback: try to convert to Map
+        json = jsonData as Map<String, dynamic>;
+      }
+
+      final response = ForeceUpdateModel.fromJson(json);
+
+      if (response.isForce) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => AlertDialog(
+            title: const Text("Force Update"),
+            content: const Text(
+              "New version is available. Please update to the latest version.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  _openAppStore();
+                },
+                child: Text(
+                  "Update",
+                  style: GoogleFonts.inter(
+                    color: kPrimaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      // Silently handle errors - don't show error dialog for force update check
+      print('Force update check error: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _openAppStore() async {
+    const String packageName = 'com.ziewnic.loyaltyprograms';
+    // TODO: Replace with actual iOS App Store ID (numeric) once app is published
+    // You can find it in App Store Connect after publishing
+    const String iosAppStoreId = 'YOUR_APP_STORE_ID'; // e.g., '1234567890'
+    String url;
+
+    if (Platform.isIOS) {
+      // iOS App Store URL - Replace iosAppStoreId with actual numeric ID from App Store Connect
+      if (iosAppStoreId != 'YOUR_APP_STORE_ID') {
+        url = 'https://apps.apple.com/app/id$iosAppStoreId';
+        // Alternative deep link: url = 'itms-apps://apps.apple.com/app/id$iosAppStoreId';
+      } else {
+        // Fallback: Search URL using bundle identifier
+        url = 'https://apps.apple.com/us/search?term=$packageName';
+      }
+    } else if (Platform.isAndroid) {
+      // Android Play Store URL
+      url = 'https://play.google.com/store/apps/details?id=$packageName';
+      // Alternative deep link: url = 'market://details?id=$packageName';
+    } else {
+      return;
+    }
+
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 }

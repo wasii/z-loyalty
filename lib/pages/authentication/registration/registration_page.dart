@@ -138,13 +138,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           children: [
                             AppTextField(
                               controller: nameController,
-                              hintText: "Enter your Full name",
+                              hintText: "Name",
                               prefixImage: "iconusername.png",
                             ),
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: userNameController,
-                              hintText: "Enter your Username",
+                              hintText: "Mobile No. as Username",
                               prefixImage: "iconusername.png",
                               keyboardType: TextInputType.phone,
                               focusNode: userFocusNode,
@@ -152,14 +152,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: passwordController,
-                              hintText: "Enter your Password",
+                              hintText: "Password (Sign In Password)",
                               prefixImage: "iconpassword.png",
                               isPassword: true,
                             ),
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: confirmPasswordController,
-                              hintText: "Confirm Password",
+                              hintText: "Confirm password",
                               prefixImage: "iconpassword.png",
                               isPassword: true,
                             ),
@@ -180,7 +180,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 Expanded(
                                   child: AppTextField(
                                     controller: phoneNumberController,
-                                    hintText: "Enter Phone number",
+                                    hintText: "Whatsapp Number",
                                     prefixImage: "iconphonenumber.png",
                                     keyboardType: TextInputType.phone,
                                   ),
@@ -190,7 +190,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: emailController,
-                              hintText: "Enter your Email Address",
+                              hintText: "Email",
                               prefixImage: "iconmessage.png",
                             ),
                             const SizedBox(height: 16),
@@ -203,26 +203,26 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: experienceInYearsController,
-                              hintText: "Experience in years",
+                              hintText: "Experience In Years",
                               prefixImage: "iconpassword.png",
                               keyboardType: TextInputType.number,
                             ),
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: addressController,
-                              hintText: "Enter your Full Address",
+                              hintText: "Address",
                               prefixImage: "iconaddress.png",
                             ),
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: easyPaisaController,
-                              hintText: "Easypaisa Account Details",
+                              hintText: "Easypaisa Details",
                               prefixImage: "iconcard.png",
                             ),
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: jazzCashController,
-                              hintText: "Jazzcash Account Details",
+                              hintText: "Jazz Cash Details",
                               prefixImage: "iconcard.png",
                             ),
                             const SizedBox(height: 16),
@@ -234,7 +234,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             const SizedBox(height: 16),
                             AppTextField(
                               controller: remarksController,
-                              hintText: "Enter your remarks",
+                              hintText: "Remarks",
                               prefixImage: "iconchat.png",
                             ),
                             const SizedBox(height: 16),

@@ -79,7 +79,7 @@ class ClaimPointRewardSection extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  "$points Points",
+                  "Min: $points Points",
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: kTextFieldPlaceholderColor,

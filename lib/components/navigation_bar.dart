@@ -26,15 +26,15 @@ class CustomNavigationBar extends StatelessWidget
       title: Image.asset("${kLogoFolder}ziewnic_vertical_logo.png", height: 50),
       centerTitle: true,
       actions: [
-        GestureDetector(
-          child: const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundImage: AssetImage("${kBGFolder}dummy_picture.png"),
-            ),
-          ),
-        ),
+        // GestureDetector(
+        //   child: const Padding(
+        //     padding: EdgeInsets.only(right: 12),
+        //     child: CircleAvatar(
+        //       radius: 18,
+        //       backgroundImage: AssetImage("${kBGFolder}dummy_picture.png"),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

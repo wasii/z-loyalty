@@ -65,77 +65,45 @@ class _LoyaltyRewardHomeState extends State<LoyaltyRewardHome> {
                     pointsSpent: pointsSpent.toString(),
                   ),
                   const SizedBox(height: 20),
-                  if (schemeDetails.isNotEmpty)
-                    Column(
-                      children: [
-                        ...schemeDetails.map((scheme) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: ClaimPointRewardSection(
-                              title: scheme.itemName,
-                              points: scheme.minPoints,
-                              imagePath: scheme.picUrl,
-                              onClaim: () {
-                                // Handle claim action if needed
-                              },
-                              editable: true,
-                            ),
-                          );
-                        }).toList(),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  if (rewards.isEmpty)
-                    Center(
-                      child: Text(
-                        'No Data Found',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: kTextFieldPlaceholderColor,
-                        ),
+                  Column(
+                    children: [
+                      _ExpandableTab(
+                        title: 'Pending (Claimed)',
+                        count: pendingRewards.length,
+                        isExpanded: isPendingExpanded,
+                        onTap: () {
+                          setState(() {
+                            isPendingExpanded = !isPendingExpanded;
+                          });
+                        },
+                        rewards: pendingRewards,
                       ),
-                    )
-                  else
-                    Column(
-                      children: [
-                        _ExpandableTab(
-                          title: 'Pending (Claimed)',
-                          count: pendingRewards.length,
-                          isExpanded: isPendingExpanded,
-                          onTap: () {
-                            setState(() {
-                              isPendingExpanded = !isPendingExpanded;
-                            });
-                          },
-                          rewards: pendingRewards,
-                        ),
-                        const SizedBox(height: 12),
-                        _ExpandableTab(
-                          title: 'Rewarded',
-                          count: completedRewards.length,
-                          isExpanded: isCompletedExpanded,
-                          onTap: () {
-                            setState(() {
-                              isCompletedExpanded = !isCompletedExpanded;
-                            });
-                          },
-                          rewards: completedRewards,
-                        ),
-                        const SizedBox(height: 12),
-                        _ExpandableTab(
-                          title: 'Rejected',
-                          count: rejectedRewards.length,
-                          isExpanded: isRejectedExpanded,
-                          onTap: () {
-                            setState(() {
-                              isRejectedExpanded = !isRejectedExpanded;
-                            });
-                          },
-                          rewards: rejectedRewards,
-                        ),
-                      ],
-                    ),
+                      const SizedBox(height: 12),
+                      _ExpandableTab(
+                        title: 'Rewarded',
+                        count: completedRewards.length,
+                        isExpanded: isCompletedExpanded,
+                        onTap: () {
+                          setState(() {
+                            isCompletedExpanded = !isCompletedExpanded;
+                          });
+                        },
+                        rewards: completedRewards,
+                      ),
+                      const SizedBox(height: 12),
+                      _ExpandableTab(
+                        title: 'Rejected',
+                        count: rejectedRewards.length,
+                        isExpanded: isRejectedExpanded,
+                        onTap: () {
+                          setState(() {
+                            isRejectedExpanded = !isRejectedExpanded;
+                          });
+                        },
+                        rewards: rejectedRewards,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -223,7 +191,7 @@ class LoyaltyRewardHeader extends StatelessWidget {
             children: [
               CustomHeading(heading: heading),
               const SizedBox(height: 16),
-              _DateRangePill(text: dateRange),
+              // _DateRangePill(text: dateRange),
             ],
           ),
         ),

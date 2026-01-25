@@ -97,7 +97,7 @@ class _InstallationHomeState extends State<InstallationHome> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomHeading(heading: 'Scan Loyalty Card'),
+                    CustomHeading(heading: 'Scan Serial Number'),
                     SizedBox(height: 20),
                     Container(
                       height: 200,

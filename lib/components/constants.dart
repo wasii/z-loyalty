@@ -3,6 +3,7 @@
 // import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:loyalty_program/models/force_update.dart';
 
 const kSFProDisplay = 'Poppins';
 const kPrimaryColorString = '7FA53F';
@@ -45,7 +46,7 @@ const LoginAPI = 'login.php';
 const SendOTP = 'send_otp.php';
 const ForgotPassword = 'forgot_password.php';
 const ChangePassword = 'change_password.php';
-
+const ForeceUpdate = 'app_version.php?current_version=';
 const DashboardGetPoints = 'installer_dashboard.php';
 
 //Registration
