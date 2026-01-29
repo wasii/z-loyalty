@@ -275,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
       final api = ApiService();
 
       final request = await api.request(
-        path: "${ForeceUpdate}1",
+        path: "${ForeceUpdate}1.0.0",
         type: RequestType.post,
         data: {},
         useFormData: false,

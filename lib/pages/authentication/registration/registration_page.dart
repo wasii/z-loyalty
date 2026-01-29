@@ -6,9 +6,11 @@ import 'package:loyalty_program/components/app_text_field.dart';
 import 'package:loyalty_program/components/authentication_header.dart';
 import 'package:loyalty_program/components/authentication_header_text.dart';
 import 'package:loyalty_program/components/constants.dart';
+import 'package:loyalty_program/components/custom_otp_fields.dart';
 import 'package:loyalty_program/components/loader.dart';
 import 'package:loyalty_program/components/primary_button.dart';
 import 'package:loyalty_program/models/check_username_model.dart';
+import 'package:loyalty_program/models/send_otp_model.dart';
 import 'package:loyalty_program/models/user_registration_model.dart';
 import 'package:loyalty_program/network/api_service.dart';
 import 'package:loyalty_program/pages/authentication/registration_successful/registration_successful.dart';
@@ -46,6 +48,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool isLoading = false;
 
   bool usernameExist = false;
+  String? receivedOTP; // Store OTP from API response
 
   final FocusNode userFocusNode = FocusNode();
 
@@ -241,7 +244,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             PrimaryButton(
                               text: 'Sign Up',
                               onPressed: () {
-                                userregistration();
+                                getOTP();
                               },
                               enabled: isButtonEnabled,
                             ),
@@ -344,7 +347,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
-  void userregistration() async {
+  Future<void> userregistration() async {
     FocusScope.of(context).unfocus();
     setState(() => isLoading = true);
 
@@ -375,7 +378,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       final user = UserRegistrationModel.fromJson(json);
 
       if (user.error == 0) {
-        // Successful login
+        // Successful registration
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -417,5 +420,250 @@ class _RegistrationPageState extends State<RegistrationPage> {
     } finally {
       setState(() => isLoading = false);
     }
+  }
+
+  Future<void> getOTP() async {
+    FocusScope.of(context).unfocus();
+    setState(() => isLoading = true);
+
+    try {
+      final api = ApiService();
+
+      final response = await api.request(
+        path: SendOTP,
+        type: RequestType.post,
+        data: {'username': userNameController.text},
+        useFormData: true,
+      );
+
+      final json = response.data;
+      final model = SendOTPModel.fromJson(json);
+
+      if (model.error == 0) {
+        // Store the OTP from response
+        receivedOTP = model.send_otp.toString();
+        // Show OTP dialog popup
+        showOTPDialog();
+      } else {
+        // Show error alert from response message
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("OTP Failed"),
+            content: Text(model.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Sent OTP Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void showOTPDialog() {
+    String enteredOTP = '';
+    bool isOTPComplete = false;
+    bool isVerifying = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogBuilderContext) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isSmallScreen = screenWidth < 360;
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: screenWidth * 0.9,
+                  maxHeight: MediaQuery.of(context).size.height * 0.6,
+                ),
+                padding: EdgeInsets.all(isSmallScreen ? 16 : 24),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Enter OTP',
+                        style: GoogleFonts.inter(
+                          fontSize: isSmallScreen ? 18 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Enter the 5-digit OTP code sent to ${userNameController.text}',
+                        style: GoogleFonts.inter(
+                          fontSize: isSmallScreen ? 12 : 14,
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      // OTP Fields Container - responsive and centered
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 8 : 16,
+                        ),
+                        child: Center(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: OTPInputWidget(
+                              length: 5,
+                              onCompleted: (code) {
+                                enteredOTP = code;
+                                setDialogState(() {
+                                  isOTPComplete = true;
+                                });
+                              },
+                              onChanged: (code) {
+                                enteredOTP = code;
+                                setDialogState(() {
+                                  isOTPComplete = code.length == 5;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      if (isVerifying)
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 16),
+                          child: CircularProgressIndicator(),
+                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: isSmallScreen ? 100 : 120,
+                            child: ElevatedButton(
+                              onPressed: (isOTPComplete && !isVerifying)
+                                  ? () async {
+                                      // Validate OTP
+                                      if (receivedOTP == null ||
+                                          receivedOTP!.isEmpty) {
+                                        showDialog(
+                                          context: dialogBuilderContext,
+                                          builder: (_) => AlertDialog(
+                                            title: const Text("Error"),
+                                            content: const Text(
+                                              "OTP not received. Please try again.",
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                  dialogBuilderContext,
+                                                ),
+                                                child: const Text("OK"),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      setDialogState(() {
+                                        isVerifying = true;
+                                      });
+
+                                      // Pad OTP to 5 digits if needed (e.g., 123 -> 00123)
+                                      String expectedOTP = receivedOTP!.padLeft(
+                                        5,
+                                        '0',
+                                      );
+                                      // Take only first 5 digits if OTP is longer
+                                      if (expectedOTP.length > 5) {
+                                        expectedOTP = expectedOTP.substring(
+                                          0,
+                                          5,
+                                        );
+                                      }
+
+                                      // Validate entered OTP with received OTP
+                                      if (enteredOTP == expectedOTP) {
+                                        // OTP matched - close dialog and call registration
+                                        Navigator.pop(dialogBuilderContext);
+                                        await userregistration();
+                                      } else {
+                                        // OTP mismatch
+                                        setDialogState(() {
+                                          isVerifying = false;
+                                        });
+                                        showDialog(
+                                          context: dialogBuilderContext,
+                                          builder: (_) => AlertDialog(
+                                            title: const Text("Invalid OTP"),
+                                            content: const Text(
+                                              "The OTP you entered is incorrect. Please try again.",
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: const Text("OK"),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor,
+                                disabledBackgroundColor:
+                                    kDefaultDisabledButtonColor,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isSmallScreen ? 10 : 12,
+                                  horizontal: isSmallScreen ? 16 : 20,
+                                ),
+                              ),
+                              child: Text(
+                                'Verify',
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: isSmallScreen ? 14 : 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }
