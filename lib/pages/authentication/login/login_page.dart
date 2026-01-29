@@ -312,7 +312,10 @@ class _LoginPageState extends State<LoginPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  _openAppStore();
+                  _openAppStore(
+                    iosUrl: response.iosurl,
+                    androidUrl: response.androidurl,
+                  );
                 },
                 child: Text(
                   "Update",
@@ -336,27 +339,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _openAppStore() async {
-    const String packageName = 'com.ziewnic.loyaltyprograms';
-    // TODO: Replace with actual iOS App Store ID (numeric) once app is published
-    // You can find it in App Store Connect after publishing
-    const String iosAppStoreId = 'YOUR_APP_STORE_ID'; // e.g., '1234567890'
+  Future<void> _openAppStore({
+    required String iosUrl,
+    required String androidUrl,
+  }) async {
     String url;
 
     if (Platform.isIOS) {
-      // iOS App Store URL - Replace iosAppStoreId with actual numeric ID from App Store Connect
-      if (iosAppStoreId != 'YOUR_APP_STORE_ID') {
-        url = 'https://apps.apple.com/app/id$iosAppStoreId';
-        // Alternative deep link: url = 'itms-apps://apps.apple.com/app/id$iosAppStoreId';
-      } else {
-        // Fallback: Search URL using bundle identifier
-        url = 'https://apps.apple.com/us/search?term=$packageName';
-      }
+      url = iosUrl.isNotEmpty ? iosUrl : '';
     } else if (Platform.isAndroid) {
-      // Android Play Store URL
-      url = 'https://play.google.com/store/apps/details?id=$packageName';
-      // Alternative deep link: url = 'market://details?id=$packageName';
+      url = androidUrl.isNotEmpty ? androidUrl : '';
     } else {
+      return;
+    }
+
+    if (url.isEmpty) {
       return;
     }
 
